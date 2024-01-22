@@ -10,11 +10,16 @@ const Place = require("./models/place")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const multer = require("multer")
-const fs = require("fs")
+const fs = require("fs");
+const mercadopago = require("mercadopago");
 //pW7KIz9gFG0Emrw7 
-
+const mercadopagoRoutes = require("./payment-routes")
 const bcryptSalt = bcrypt.genSaltSync(10)
 const jwtSecret = "ksdojodksokdmc3"
+const initializePassport = require('./passport')
+const authRouter = require('./auth-routes');
+
+initializePassport();
 
 app.use(express.json())
 
@@ -26,6 +31,9 @@ app.use(cors({
     credentials: true,
     origin: 'http://localhost:5173'
 }));
+
+app.use("/mp", mercadopagoRoutes);
+app.use('/auth', authRouter); 
 
 mongoose.connect(process.env.MONGO_URL)
 
