@@ -8,6 +8,7 @@ const passport = require('passport');
 require("dotenv").config()
 const User = require("./models/user")
 const Place = require("./models/place")
+const Booking = require("./models/booking")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const multer = require("multer")
@@ -20,12 +21,13 @@ const bcryptSalt = bcrypt.genSaltSync(10)
 const jwtSecret = "ksdojodksokdmc3"
 const authRouter = require('./auth-routes');
 const reviewController = require("./review-controller");
+const nodemailer = require('nodemailer');
 
 app.use(session({
     secret: process.env.JWT_SECRET,
     resave: false,
     saveUninitialized: true,
-  }));
+}));
 
 const initializePassport = require('./passport')
 initializePassport();
@@ -46,7 +48,7 @@ app.use(cors({
 }));
 
 app.use("/mp", mercadopagoRoutes);
-app.use('/auth', authRouter); 
+app.use('/auth', authRouter);
 
 mongoose.connect(process.env.MONGO_URL)
 
@@ -54,21 +56,55 @@ app.get("/test", (req, res) => {
     res.json("test ok")
 })
 
+
+//config del nodemailer
+const transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
+    }
+});
+
 app.post("/register", async (req, res) => {
     try {
-        const { name, email, password } = req.body
+        const { name, email, password } = req.body;
+
+       
         const userDoc = await User.create({
             name,
             email,
             password: bcrypt.hashSync(password, bcryptSalt),
-        })
+        });
 
-        res.status(201).json(userDoc)
+        // funcion para enviar el email de bienvenida
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: '¡Bienvenido a Mountain Haven - Tu Refugio en la Montaña!',
+            text: `Hola ${name},\n\n¡Bienvenido a Mountain Haven!\n\n
+            Estamos encantados de darte la bienvenida a nuestra comunidad de amantes de la naturaleza y aventureros. En Mountain Haven, nos dedicamos a proporcionar experiencias excepcionales en alojamientos encantadores, perfectos para tu escapada a la montaña.\n\nGracias por unirte a nosotros. Tu próximo viaje está a punto de comenzar, y estamos emocionados de ser parte de tus experiencias en la montaña.\n\n
+            Ya sea que busques la comodidad de una cabaña acogedora o la vista panorámica desde una suite de lujo, en Mountain Haven encontrarás el refugio perfecto para tus momentos especiales.\n\nSi necesitas ayuda para planificar tu estancia o tienes alguna pregunta, nuestro equipo está aquí para ayudarte. Explora nuestras opciones de alojamiento y descubre la magia que Mountain Haven tiene reservada para ti.\n\n
+            ¡Esperamos que disfrutes de tu estancia en nuestro refugio en la montaña!\n\n
+            Saludos cordiales,\n\n
+            El equipo de Mountain Haven`
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Error al enviar el correo electrónico:', error);
+            } else {
+                console.log('Correo electrónico enviado exitosamente:', info.response);
+            }
+        });
+
+        res.status(201).json(userDoc);
     } catch (error) {
-        res.status(422).json({ error: error.message })
+        res.status(422).json({ error: error.message });
     }
-
 });
+
 
 app.post("/login", async (req, res) => {
     const { email, password } = req.body
@@ -141,7 +177,7 @@ app.post("/upload", photosMiddleware.array('photos', 100), (req, res) => {
 app.post("/places", (req, res) => {
     const { token } = req.cookies;
     const { data } = req.body
-    const { title, address, photos, description, perks, extraInfo, checkIn, checkOut, guests, price} = data
+    const { title, address, photos, description, perks, extraInfo, checkIn, checkOut, guests, price } = data
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
         if (err) throw err;
         const placeDoc = await Place.create({
@@ -180,8 +216,8 @@ app.get("/places/:id", async (req, res) => {
 app.put("/places", async (req, res) => {
     const { token } = req.cookies;
     const { data } = req.body
-    const { title, address, photos, description, perks, extraInfo, checkIn, checkOut, guests, price} = data
-    const {id} = req.body
+    const { title, address, photos, description, perks, extraInfo, checkIn, checkOut, guests, price } = data
+    const { id } = req.body
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
         if (err) throw err;
         const placeDoc = await Place.findById(id)
@@ -196,11 +232,37 @@ app.put("/places", async (req, res) => {
 })
 
 app.get("/places", async (req, res) => {
-    res.json( await Place.find())
+    res.json(await Place.find())
+})
+
+app.post("/bookings", async (req, res) => {
+    try {
+        const { token } = req.cookies;
+        const { place, checkIn, checkOut, numberOfGuests, name, phone, price } = req.body
+        jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+            if (err) throw err;
+            const bookingDoc = await Booking.create({
+                place, checkIn, checkOut, numberOfGuests, name, phone, price, user: userData.id
+            })
+            res.json(bookingDoc)
+        })
+    } catch (error) {
+        res.status(404).json("error")
+    }
+
+})
+
+
+app.get("/bookings", async (req, res) => {
+    const { token } = req.cookies;
+    jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+        const { id } = userData
+        res.json(await Booking.find({ user: id }).populate("place"))
+    })
 })
 
 app.post("/places/:placeId/reviews", reviewController.createReview);
 app.get("/places/:placeId/reviews", reviewController.getReviewsByPlace);
 // app.get("/places/:placeId", getPlaceById);
 
-app.listen(4000)
+app.listen(4000,()=>{console.log("Conectado ponete a codear")})
