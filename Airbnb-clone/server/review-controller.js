@@ -7,7 +7,7 @@ const jwtSecret = "ksdojodksokdmc3";
 const createReview = async (req, res) => {
     const { token } = req.cookies;
     const { data } = req.body;
-    const { placeId } = req.params;  // Obtener placeId de los parámetros de la URL
+    const { placeId } = req.params;
     const { rating, reviewText } = data;
 
     try {
@@ -22,6 +22,11 @@ const createReview = async (req, res) => {
                 rating,
                 reviewText,
             });
+
+            // Asociar la revisión al lugar
+            const place = await Place.findById(placeId);
+            place.reviews.push(reviewDoc._id);
+            await place.save();
 
             // Calcular el nuevo promedio de puntuaciones para el alojamiento
             const reviews = await Review.find({ place: placeId });
@@ -41,11 +46,12 @@ const createReview = async (req, res) => {
     }
 };
 
+
 const getReviewsByPlace = async (req, res) => {
     const { placeId } = req.params;
 
     try {
-        // Obtener las revisiones para un lugar específico
+        // Obtener las revisiones para un lugar específico, incluyendo la información del usuario
         const reviews = await Review.find({ place: placeId }).populate("user");
 
         res.json(reviews);

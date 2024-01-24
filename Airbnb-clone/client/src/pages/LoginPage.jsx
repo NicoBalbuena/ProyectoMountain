@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link} from "react-router-dom";
 import axios from "axios";
 import { UserContext } from "../components/UserContext";
 import { useNavigate } from 'react-router-dom'; // Importa useNavigate
@@ -73,7 +73,7 @@ const LoginPage = () => {
           </button>
           
           <div className="text-center py-2 text-gray-500">
-            Don't have an account yet?{" "}
+            Do not have an account yet?{" "}
             <Link className="underline text-bn" to={"/register"}>
               Register now
             </Link>
