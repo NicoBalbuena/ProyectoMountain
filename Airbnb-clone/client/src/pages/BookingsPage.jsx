@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import AccountNav from "../components/AccountNav"
 import axios from "axios"
 import PlaceImg from "../components/PlaceImg"
-import { differenceInCalendarDays, format } from "date-fns"
+import { differenceInCalendarDays, format } from "date-fns";
 import { Link } from "react-router-dom"
 
 const BookingsPage = () => {

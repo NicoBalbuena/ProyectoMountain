@@ -215,4 +215,4 @@ app.get("/bookings", async (req, res) => {
 app.post("/places/:placeId/reviews", reviewController.createReview);
 app.get("/places/:placeId/reviews", reviewController.getReviewsByPlace);
 
-app.listen(4000)
+app.listen(4000,()=>{console.log("Conectado ponete a codear")})
