@@ -76,7 +76,7 @@ app.post("/register", async (req, res) => {
             password: bcrypt.hashSync(password, bcryptSalt),
         });
 
-        // funcion para enviar el email de bienvenida
+        // funcion para enviar el email de bienvenida 
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: email,
