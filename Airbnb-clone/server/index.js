@@ -18,6 +18,7 @@ const bcryptSalt = bcrypt.genSaltSync(10)
 const jwtSecret = "ksdojodksokdmc3"
 const initializePassport = require('./passport')
 const authRouter = require('./auth-routes');
+const reviewController = require("./review-controller");
 
 initializePassport();
 
@@ -173,5 +174,8 @@ app.put("/places", async (req, res) => {
 app.get("/places", async (req, res) => {
     res.json( await Place.find())
 })
+
+app.post("/places/:placeId/reviews", reviewController.createReview);
+app.get("/places/:placeId/reviews", reviewController.getReviewsByPlace);
 
 app.listen(4000)
