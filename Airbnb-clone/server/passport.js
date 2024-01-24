@@ -27,38 +27,33 @@ function initializePassport() {
         callbackURL: 'http://localhost:4000/auth/login/google/callback',
       },
       async (accessToken, refreshToken, profile, done) => {
-        console.log('este es el log de profile:', profile);
+        console.log(profile);
         const { id, displayName, emails } = profile;
 
         try {
           // Verifica si el usuario ya existe en la base de datos
           const existingUser = await User.findOne({ googleId: id });
-  
+
           if (existingUser) {
             // Actualiza la información del usuario si es necesario
             existingUser.displayName = displayName;
             existingUser.email = emails[0].value;
+            existingUser.token = accessToken;
             await existingUser.save();
-  
+
             // Devuelve el usuario actualizado
             return done(null, existingUser);
           } else {
-            try {
-              // Crea un nuevo usuario en la base de datos
-              console.log('Creando nuevo usuario:', profile.id, profile.displayName, profile.emails[0].value);
-              const newUser = await User.create({
-                googleId: id,
-                displayName,
-                email: emails[0].value,
-              });
-              console.log('Nuevo usuario creado:', newUser);
-  
-              // Devuelve el nuevo usuario creado
-              return done(null, newUser);
-            } catch (error) {
-              console.error('Error al crear nuevo usuario', error);
-              return done(error, null);
-            }
+            // Crea un nuevo usuario en la base de datos
+            const newUser = await User.create({
+              googleId: id,
+              displayName,
+              email: emails[0].value,
+              token: accessToken,
+            });
+
+            // Devuelve el nuevo usuario creado
+            return done(null, newUser);
           }
         } catch (error) {
           console.log(error);
