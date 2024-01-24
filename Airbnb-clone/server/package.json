@@ -3,12 +3,8 @@
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-<<<<<<< HEAD
     "dotenv": "^16.3.1",
-=======
     "date-fns": "^3.3.1",
-    "dotenv": "^16.3.2",
->>>>>>> 1a672bc88bd2b28674fba1e9370ec5ef82a319df
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "image-downloader": "^4.3.0",
