@@ -20,6 +20,7 @@ const bcryptSalt = bcrypt.genSaltSync(10);
 const jwtSecret = "ksdojodksokdmc3";
 const authRouter = require("./auth-routes");
 const reviewController = require("./review-controller");
+const nodemailer = require("nodemailer");
 
 app.use(
   session({
@@ -54,13 +55,45 @@ app.get("/test", (req, res) => {
   res.json("test ok");
 });
 
+//config del nodemailer
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: process.env.EMAIL_PORT,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+});
+
 app.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
+
     const userDoc = await User.create({
       name,
       email,
       password: bcrypt.hashSync(password, bcryptSalt),
+    });
+
+    // funcion para enviar el email de bienvenida
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "¡Bienvenido a Mountain Haven - Tu Refugio en la Montaña!",
+      text: `Hola ${name},\n\n¡Bienvenido a Mountain Haven!\n\n
+            Estamos encantados de darte la bienvenida a nuestra comunidad de amantes de la naturaleza y aventureros. En Mountain Haven, nos dedicamos a proporcionar experiencias excepcionales en alojamientos encantadores, perfectos para tu escapada a la montaña.\n\nGracias por unirte a nosotros. Tu próximo viaje está a punto de comenzar, y estamos emocionados de ser parte de tus experiencias en la montaña.\n\n
+            Ya sea que busques la comodidad de una cabaña acogedora o la vista panorámica desde una suite de lujo, en Mountain Haven encontrarás el refugio perfecto para tus momentos especiales.\n\nSi necesitas ayuda para planificar tu estancia o tienes alguna pregunta, nuestro equipo está aquí para ayudarte. Explora nuestras opciones de alojamiento y descubre la magia que Mountain Haven tiene reservada para ti.\n\n
+            ¡Esperamos que disfrutes de tu estancia en nuestro refugio en la montaña!\n\n
+            Saludos cordiales,\n\n
+            El equipo de Mountain Haven`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error al enviar el correo electrónico:", error);
+      } else {
+        console.log("Correo electrónico enviado exitosamente:", info.response);
+      }
     });
 
     res.status(201).json(userDoc);
@@ -189,7 +222,22 @@ app.get("/user-places", (req, res) => {
 
 app.get("/places/:id", async (req, res) => {
   const { id } = req.params;
-  res.json(await Place.findById(id));
+
+  try {
+    // Obtener los detalles del lugar incluyendo las revisiones asociadas, excluyendo _id de las revisiones
+    const place = await Place.findById(id).populate({
+      path: "reviews",
+      select: "-_id -place",
+    });
+
+    if (!place) {
+      return res.status(404).json({ error: "Place not found" });
+    }
+
+    res.json(place);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 app.put("/places", async (req, res) => {
@@ -268,6 +316,7 @@ app.get("/bookings", async (req, res) => {
 
 app.post("/places/:placeId/reviews", reviewController.createReview);
 app.get("/places/:placeId/reviews", reviewController.getReviewsByPlace);
+// app.get("/places/:placeId", getPlaceById);
 
 app.listen(4000, () => {
   console.log("Conectado ponete a codear");
