@@ -4,6 +4,7 @@ const express = require("express");
 const app = express()
 const cors = require("cors");
 const mongoose = require("mongoose");
+const passport = require('passport');
 require("dotenv").config()
 const User = require("./models/user")
 const Place = require("./models/place")
@@ -11,15 +12,25 @@ const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const multer = require("multer")
 const fs = require("fs");
+const session = require('express-session');
 const mercadopago = require("mercadopago");
 //pW7KIz9gFG0Emrw7 
 const mercadopagoRoutes = require("./payment-routes")
 const bcryptSalt = bcrypt.genSaltSync(10)
 const jwtSecret = "ksdojodksokdmc3"
-const initializePassport = require('./passport')
 const authRouter = require('./auth-routes');
+const reviewController = require("./review-controller");
 
+app.use(session({
+    secret: jwtSecret,
+    resave: false,
+    saveUninitialized: true,
+  }));
+
+const initializePassport = require('./passport')
 initializePassport();
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(express.json())
 
@@ -173,5 +184,8 @@ app.put("/places", async (req, res) => {
 app.get("/places", async (req, res) => {
     res.json( await Place.find())
 })
+
+app.post("/places/:placeId/reviews", reviewController.createReview);
+app.get("/places/:placeId/reviews", reviewController.getReviewsByPlace);
 
 app.listen(4000)
