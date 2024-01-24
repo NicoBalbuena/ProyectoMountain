@@ -1,10 +1,10 @@
 const mercadopago = require("mercadopago");
 const dotenv = require("dotenv");
-const mongoose = require("mongoose");
+const Place = require("./models/place");
 
 dotenv.config();
 
-const createOrder = (req, res) => {
+const createOrder = async (req, res) => {
   mercadopago.configure({
     access_token: process.env.MP_Token,
   });
@@ -15,43 +15,57 @@ const createOrder = (req, res) => {
     return res.status(400).json({ message: "Invalid place ID" });
   }
 
-  mongoose
-    .model("Place")
-    .findById(placeId)
-    .then((place) => {
-      if (!place) {
-        return res.status(404).json({ message: "Place not found" });
-      }
+  try {
+    const place = await Place.findById(placeId);
 
-      const preference = {
-        items: [
-          {
-            title: place.title,
-            unit_price: parseFloat(place.price),
-            currency_id: "ARS",
-            quantity: 1,
-          },
-        ],
-        back_urls: {
-          success: "http://localhost:4000/success",
+    if (!place) {
+      return res.status(404).json({ message: "Place not found" });
+    }
+
+    const preference = {
+      items: [
+        {
+          title: place.title,
+          unit_price: parseFloat(place.price),
+          currency_id: "ARS",
+          quantity: 1,
         },
-        notification_url: "http://localhost:4000/webhook",
-      };
-      console.log(preference)
-      return mercadopago.preferences.create(preference);
-    })
-    .then((response) => {
-      console.log(response);
-      res.json(response.body);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).json({ message: "Error processing payment" });
-    });
+      ],
+      back_urls: {
+        success: "http://localhost:4000/success",
+      },
+      notification_url: "http://localhost:4000/webhook",
+    };
+
+    console.log(preference);
+
+    const response = await mercadopago.preferences.create(preference);
+
+    console.log(response);
+    
+    if (response.body.init_point) {
+      res.redirect(response.body.init_point);
+    } else if (error.response && error.response.status === 400) {
+      res.status(400).json({ message: "Solicitud inválida" });
+    } else if (error.response && error.response.status === 404) {
+      res.status(404).json({ message: "Lugar no encontrado" });
+    } else {
+      res.status(500).json({ message: "Error al procesar el pago" });
+    }
+  } catch (error) {
+    console.error(error);
+    if (error.response && error.response.status === 400) {
+      res.status(400).json({ message: "Solicitud inválida" });
+    } else if (error.response && error.response.status === 404) {
+      res.status(404).json({ message: "Lugar no encontrado" });
+    } else {
+      res.status(500).json({ message: "Error al procesar el pago" });
+    }
+  }
 };
 
 const recieveWebhook = (req, res) => {
-  const payment = req.query;
+  const payment = req.body;
 
   console.log(payment);
 
