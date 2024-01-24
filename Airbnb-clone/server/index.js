@@ -8,6 +8,7 @@ const passport = require('passport');
 require("dotenv").config()
 const User = require("./models/user")
 const Place = require("./models/place")
+const Booking = require("./models/booking")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const multer = require("multer")
@@ -139,7 +140,7 @@ app.post("/upload", photosMiddleware.array('photos', 100), (req, res) => {
 app.post("/places", (req, res) => {
     const { token } = req.cookies;
     const { data } = req.body
-    const { title, address, photos, description, perks, extraInfo, checkIn, checkOut, guests, price} = data
+    const { title, address, photos, description, perks, extraInfo, checkIn, checkOut, guests, price } = data
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
         if (err) throw err;
         const placeDoc = await Place.create({
@@ -166,8 +167,8 @@ app.get("/places/:id", async (req, res) => {
 app.put("/places", async (req, res) => {
     const { token } = req.cookies;
     const { data } = req.body
-    const { title, address, photos, description, perks, extraInfo, checkIn, checkOut, guests, price} = data
-    const {id} = req.body
+    const { title, address, photos, description, perks, extraInfo, checkIn, checkOut, guests, price } = data
+    const { id } = req.body
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
         if (err) throw err;
         const placeDoc = await Place.findById(id)
@@ -182,7 +183,33 @@ app.put("/places", async (req, res) => {
 })
 
 app.get("/places", async (req, res) => {
-    res.json( await Place.find())
+    res.json(await Place.find())
+})
+
+app.post("/bookings", async (req, res) => {
+    try {
+        const { token } = req.cookies;
+        const { place, checkIn, checkOut, numberOfGuests, name, phone, price } = req.body
+        jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+            if (err) throw err;
+            const bookingDoc = await Booking.create({
+                place, checkIn, checkOut, numberOfGuests, name, phone, price, user: userData.id
+            })
+            res.json(bookingDoc)
+        })
+    } catch (error) {
+        res.status(404).json("error")
+    }
+
+})
+
+
+app.get("/bookings", async (req, res) => {
+    const { token } = req.cookies;
+    jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+        const { id } = userData
+        res.json(await Booking.find({ user: id }).populate("place"))
+    })
 })
 
 app.post("/places/:placeId/reviews", reviewController.createReview);

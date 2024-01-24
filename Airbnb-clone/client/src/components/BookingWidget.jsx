@@ -16,6 +16,9 @@ const BookingWidget = ({ place }) => {
     const {user} = useContext(UserContext)
 
     useEffect(() => {
+        if(!user) {
+            return
+        }
         setName(user.name)
     }, [user])
 
@@ -26,9 +29,14 @@ const BookingWidget = ({ place }) => {
     }
 
     const bookThisPlace = async () => {
-        const response = await axios.post("http://localhost:4000/bookings", { checkIn, checkOut, numberOfGuests, name, phone, place: place._id, price: numberOfNights * place.price }, { withCredentials: true })
-        const bookingId = response.data._id
-        setRedirect(`/account/bookings/${bookingId}`)
+        if(user) {
+            const response = await axios.post("http://localhost:4000/bookings", { checkIn, checkOut, numberOfGuests, name, phone, place: place._id, price: numberOfNights * place.price * numberOfGuests }, { withCredentials: true })
+            const bookingId = response.data._id
+            setRedirect(`/account/bookings/${bookingId}`)
+        } else {
+            alert("log in to reserve")
+        }
+        
     }
 
     if (redirect) {
@@ -69,7 +77,7 @@ const BookingWidget = ({ place }) => {
             <button onClick={bookThisPlace} className="primary mt-4">
                 Book this place
                 {numberOfNights > 0 && (
-                    <span> ${numberOfNights * place.price}</span>
+                    <span> ${numberOfNights * place.price * numberOfGuests}</span>
                 )}
             </button>
         </div>
