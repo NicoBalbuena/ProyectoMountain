@@ -7,7 +7,7 @@ mp.post("/create-order/:placeId", createOrder);
 
 mp.post("/webhook", recieveWebhook);
 
-mp.get("/success", (req, res) => res.send("Success"));
+mp.get("/success", (req, res) => res.redirect("http://localhost:4000/success"));
 
 // mp.get("/failure", (req, res) => res.send("Failure"));
 
