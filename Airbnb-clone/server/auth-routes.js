@@ -12,7 +12,7 @@ authRouter.get('/login/google', passport.authenticate('google', { scope: ['profi
 authRouter.get('/login/google/callback', passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
     // Redirección exitosa después de la autenticación con Google
-    res.redirect('/');
+    res.redirect('http://localhost:5173/');
   }
 );
 
