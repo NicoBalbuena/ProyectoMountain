@@ -159,9 +159,21 @@ app.get("/user-places", (req, res) => {
 })
 
 app.get("/places/:id", async (req, res) => {
-    const { id } = req.params
-    res.json(await Place.findById(id))
-})
+    const { id } = req.params;
+
+    try {
+        // Obtener los detalles del lugar incluyendo las revisiones asociadas, excluyendo _id de las revisiones
+        const place = await Place.findById(id).populate({ path: 'reviews', select: '-_id -place' });
+
+        if (!place) {
+            return res.status(404).json({ error: "Place not found" });
+        }
+
+        res.json(place);
+    } catch (error) {
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
 
 app.put("/places", async (req, res) => {
     const { token } = req.cookies;
@@ -187,5 +199,6 @@ app.get("/places", async (req, res) => {
 
 app.post("/places/:placeId/reviews", reviewController.createReview);
 app.get("/places/:placeId/reviews", reviewController.getReviewsByPlace);
+// app.get("/places/:placeId", getPlaceById);
 
 app.listen(4000)
