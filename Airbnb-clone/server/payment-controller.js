@@ -1,9 +1,16 @@
-// const mercadopago = require("mercadopago");
 const dotenv = require("dotenv");
 const Place = require("./models/place");
 const axios = require('axios');
 
 dotenv.config();
+
+const mercadopagoAxios = axios.create({
+  baseURL: 'https://api.mercadopago.com',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${process.env.MP_TOKEN}`,
+  },
+});
 
 const createOrder = async (req, res) => {
   const placeId = req.params.placeId;
@@ -34,15 +41,9 @@ const createOrder = async (req, res) => {
       notification_url: "http://localhost:4000/webhook",
     };
 
-    const mercadopagoHeaders = {
-      'Authorization': `Bearer ${process.env.MP_TOKEN}`,
-      'Content-Type': 'application/json',
-    };
-
-    const response = await axios.post(
+    const response = await mercadopagoAxios.post(
       'https://api.mercadopago.com/checkout/preferences',
-      preference,
-      { headers: mercadopagoHeaders }
+      preference
     );
 
     if (response.data.init_point) {
@@ -68,19 +69,14 @@ const recieveWebhook = (req, res) => {
   console.log(payment);
 
   if (payment.type === "payment") {
-    axios.get(`https://api.mercadopago.com/v1/payments/${payment.data.id}`, {
-      headers: {
-        'Authorization': `Bearer ${process.env.MP_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-    })
-    .then((data) => {
-      console.log(data.data);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).json({ message: "Something went wrong" });
-    });
+    mercadopagoAxios.get(`/v1/payments/${payment.data.id}`)
+      .then((data) => {
+        console.log(data.data);
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).json({ message: "Something went wrong" });
+      });
   }
 
   res.sendStatus(204);
