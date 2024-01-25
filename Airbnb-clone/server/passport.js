@@ -7,12 +7,13 @@ dotenv.config();
 
 function initializePassport() {
   passport.serializeUser((user, done) => {
-    done(null, user.id);
+    done(null, user._id);
   });
 
-  passport.deserializeUser(async (id, done) => {
+  passport.deserializeUser(async (_id, done) => {
     try {
-      const user = await User.findById(id);
+      // Busca al usuario por su ID (campo _id)
+      const user = await User.findById(_id);
       done(null, user);
     } catch (error) {
       done(error, null);
@@ -42,7 +43,7 @@ function initializePassport() {
             await existingUser.save();
 
             // Devuelve el usuario actualizado
-            return done(null, existingUser);
+            return done(null, { ...existingUser.toObject(), accessToken });
           } else {
             // Crea un nuevo usuario en la base de datos
             const newUser = await User.create({
@@ -53,7 +54,7 @@ function initializePassport() {
             });
 
             // Devuelve el nuevo usuario creado
-            return done(null, newUser);
+            return done(null, { ...newUser.toObject(), accessToken });
           }
         } catch (error) {
           console.log(error);
