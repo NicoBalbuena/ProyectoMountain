@@ -38,7 +38,7 @@ const createOrder = async (req, res) => {
       back_urls: {
         success: "http://localhost:4000/success",
       },
-      notification_url: "http://localhost:4000/webhook",
+      notification_url: "http://localhost:4000/mp/webhook",
     };
 
     const response = await mercadopagoAxios.post(
@@ -47,7 +47,7 @@ const createOrder = async (req, res) => {
     );
 
     if (response.data.init_point) {
-      res.redirect(response.data.init_point);
+      res.json({ paymentUrl: response.data.init_point });
     } else {
       res.status(500).json({ message: "Error al procesar el pago" });
     }

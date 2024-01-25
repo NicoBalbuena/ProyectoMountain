@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { differenceInCalendarDays } from "date-fns";
 import { Navigate } from "react-router-dom";
 import axios from "axios";
@@ -24,45 +24,32 @@ const BookingWidget = ({ place }) => {
   let numberOfNights = 0;
 
   if (checkIn && checkOut) {
-    numberOfNights = differenceInCalendarDays(
-      new Date(checkOut),
-      new Date(checkIn)
-    );
+    numberOfNights = differenceInCalendarDays(new Date(checkOut), new Date(checkIn));
   }
 
   const bookThisPlace = async () => {
-    try {
-      if (user) {
-        // Crear la orden en el servidor
-        const orderResponse = await axios.post(
+    if (user) {
+      try {
+        const response = await axios.post(
           `http://localhost:4000/mp/create-order/${place._id}`,
-          {
-            checkIn,
-            checkOut,
-            numberOfGuests,
-            name,
-            phone,
-            price: numberOfNights * place.price * numberOfGuests,
-          },
+          { checkIn, checkOut, numberOfGuests, name, phone },
           { withCredentials: true }
         );
-
-        // Redirigir al usuario al checkout de Mercado Pago
-        window.location.href = orderResponse.data.init_point;
-      } else {
-        alert("Log in to reserve");
+  
+        const { paymentUrl } = response.data;
+  
+        // Abre la URL de pago en una nueva pestaña
+        window.open(paymentUrl, '_blank');
+      } catch (error) {
+        alert("Error while booking");
       }
-    } catch (error) {
-      console.error("Error creating order:", error);
-      // Manejar el error adecuadamente, por ejemplo, mostrar un mensaje al usuario
+    } else {
+      alert("Log in to reserve");
     }
   };
-
   if (redirect) {
     return <Navigate to={redirect} />;
   }
-
-  console.log(checkIn, checkOut, numberOfGuests);
 
   return (
     <div className="bg-white shadow p-4 rounded-2xl">
@@ -104,4 +91,3 @@ const BookingWidget = ({ place }) => {
 };
 
 export default BookingWidget;
-
