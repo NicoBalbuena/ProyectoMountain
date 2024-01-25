@@ -159,26 +159,21 @@ app.post("/uploads-by-link", async (req, res) => {
 });
 
 const photosMiddleware = multer({ dest: "uploads/" });
-app.post(
-  "/upload",
-  photosMiddleware.array("photos", 100),
-  cloudinaryMiddleware,
-  (req, res) => {
-    const uploadedFiles = [];
-    for (let i = 0; i < req.files.length; i++) {
-      const { path, originalname } = req.files[i];
-      const parts = originalname.split(".");
-      const ext = parts[parts.length - 1];
-      const newPath = "uploads/" + Date.now() + "." + ext; // Nueva ruta sin la barra invertida
-      fs.copyFileSync(path, newPath);
-      fs.unlinkSync(path); // Elimina el archivo original
-      uploadedFiles.push(newPath.replace("uploads/", ""));
-    }
-    res.json(uploadedFiles);
+app.post("/upload", photosMiddleware.array("photos", 100), (req, res) => {
+  const uploadedFiles = [];
+  for (let i = 0; i < req.files.length; i++) {
+    const { path, originalname } = req.files[i];
+    const parts = originalname.split(".");
+    const ext = parts[parts.length - 1];
+    const newPath = "uploads/" + Date.now() + "." + ext; // Nueva ruta sin la barra invertida
+    fs.copyFileSync(path, newPath);
+    fs.unlinkSync(path); // Elimina el archivo original
+    uploadedFiles.push(newPath.replace("uploads/", ""));
   }
-);
+  res.json(uploadedFiles);
+});
 
-app.post("/places", (req, res) => {
+app.post("/places", cloudinaryMiddleware, (req, res) => {
   const { token } = req.cookies;
   const { data } = req.body;
   const {
