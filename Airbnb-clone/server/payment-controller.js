@@ -1,14 +1,18 @@
-const mercadopago = require("mercadopago");
 const dotenv = require("dotenv");
 const Place = require("./models/place");
+const axios = require('axios');
 
 dotenv.config();
 
-const createOrder = async (req, res) => {
-  mercadopago.configure({
-    access_token: process.env.MP_Token,
-  });
+const mercadopagoAxios = axios.create({
+  baseURL: 'https://api.mercadopago.com',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${process.env.MP_TOKEN}`,
+  },
+});
 
+const createOrder = async (req, res) => {
   const placeId = req.params.placeId;
 
   if (!placeId) {
@@ -37,18 +41,13 @@ const createOrder = async (req, res) => {
       notification_url: "http://localhost:4000/webhook",
     };
 
-    console.log(preference);
+    const response = await mercadopagoAxios.post(
+      'https://api.mercadopago.com/checkout/preferences',
+      preference
+    );
 
-    const response = await mercadopago.preferences.create(preference);
-
-    console.log(response);
-    
-    if (response.body.init_point) {
-      res.redirect(response.body.init_point);
-    } else if (error.response && error.response.status === 400) {
-      res.status(400).json({ message: "Solicitud inválida" });
-    } else if (error.response && error.response.status === 404) {
-      res.status(404).json({ message: "Lugar no encontrado" });
+    if (response.data.init_point) {
+      res.redirect(response.data.init_point);
     } else {
       res.status(500).json({ message: "Error al procesar el pago" });
     }
@@ -70,10 +69,9 @@ const recieveWebhook = (req, res) => {
   console.log(payment);
 
   if (payment.type === "payment") {
-    mercadopago.payment
-      .findById(payment.data.id)
+    mercadopagoAxios.get(`/v1/payments/${payment.data.id}`)
       .then((data) => {
-        console.log(data);
+        console.log(data.data);
       })
       .catch((error) => {
         console.error(error);
