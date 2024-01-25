@@ -1,13 +1,14 @@
 const cloudinary = require("../utils/cloudinary-config");
 
 async function cloudinaryMiddleware(req, res, next) {
-  if (!req.body.photos)
-    return res.status(404).json({ Message: "Image not found" });
   try {
-    await cloudinary.uploader.upload(
-      req.body.photos,
-      {
-        upload_preset: "unsigned_preset",
+    if (!req.body.data.photos) {
+      return res.status(404).json({ Message: "Image not found" });
+    }
+
+    const uploadPromises = req.body.data.photos.map(async (photoUrl) => {
+      const result = await cloudinary.uploader.upload(photoUrl, {
+        upload_preset: "ml_default",
         allowed_formats: [
           "png",
           "jpg",
@@ -18,16 +19,19 @@ async function cloudinaryMiddleware(req, res, next) {
           "png",
           "webp",
         ],
-      },
-      (err, result) => {
-        if (err) console.error(err);
-        req.body.image = result.secure_url;
-      }
-    );
+      });
+
+      return result.secure_url;
+    });
+
+    const uploadedImages = await Promise.all(uploadPromises);
+
+    req.body.data.photos = uploadedImages;
     next();
   } catch (error) {
     console.error(error);
     throw new Error({ Error: error });
   }
 }
+
 module.exports = cloudinaryMiddleware;

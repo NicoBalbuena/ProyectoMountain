@@ -24,7 +24,7 @@ const nodemailer = require("nodemailer");
 
 app.use(
   session({
-    secret: jwtSecret,
+    secret: process.env.JWT_SECRET,
     resave: false,
     saveUninitialized: true,
   })
@@ -46,6 +46,8 @@ app.use(
   cors({
     credentials: true,
     origin: "http://localhost:5173",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders: "Content-Type,Authorization",
   })
 );
 
