@@ -1,14 +1,11 @@
-const mercadopago = require("mercadopago");
+// const mercadopago = require("mercadopago");
 const dotenv = require("dotenv");
 const Place = require("./models/place");
+const axios = require('axios');
 
 dotenv.config();
 
 const createOrder = async (req, res) => {
-  mercadopago.configure({
-    access_token: process.env.MP_Token,
-  });
-
   const placeId = req.params.placeId;
 
   if (!placeId) {
@@ -37,18 +34,19 @@ const createOrder = async (req, res) => {
       notification_url: "http://localhost:4000/webhook",
     };
 
-    console.log(preference);
+    const mercadopagoHeaders = {
+      'Authorization': `Bearer ${process.env.MP_TOKEN}`,
+      'Content-Type': 'application/json',
+    };
 
-    const response = await mercadopago.preferences.create(preference);
+    const response = await axios.post(
+      'https://api.mercadopago.com/checkout/preferences',
+      preference,
+      { headers: mercadopagoHeaders }
+    );
 
-    console.log(response);
-    
-    if (response.body.init_point) {
-      res.redirect(response.body.init_point);
-    } else if (error.response && error.response.status === 400) {
-      res.status(400).json({ message: "Solicitud inválida" });
-    } else if (error.response && error.response.status === 404) {
-      res.status(404).json({ message: "Lugar no encontrado" });
+    if (response.data.init_point) {
+      res.redirect(response.data.init_point);
     } else {
       res.status(500).json({ message: "Error al procesar el pago" });
     }
@@ -70,15 +68,19 @@ const recieveWebhook = (req, res) => {
   console.log(payment);
 
   if (payment.type === "payment") {
-    mercadopago.payment
-      .findById(payment.data.id)
-      .then((data) => {
-        console.log(data);
-      })
-      .catch((error) => {
-        console.error(error);
-        res.status(500).json({ message: "Something went wrong" });
-      });
+    axios.get(`https://api.mercadopago.com/v1/payments/${payment.data.id}`, {
+      headers: {
+        'Authorization': `Bearer ${process.env.MP_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+    })
+    .then((data) => {
+      console.log(data.data);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ message: "Something went wrong" });
+    });
   }
 
   res.sendStatus(204);
