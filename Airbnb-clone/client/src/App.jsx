@@ -1,18 +1,15 @@
 import { Routes, Route } from "react-router-dom"
-//PAGES
 import IndexPage from "./pages/IndexPage"
 import LoginPage from "./pages/LoginPage"
+import Layout from "./components/Layout"
 import RegisterPage from "./pages/RegisterPage"
+import { UserContextProvider } from "./components/UserContext"
 import AccountPage from "./pages/AccountPage"
 import PlacesPage from "./pages/PlacesPage"
 import PlacesFormPage from "./pages/PlacesFormPage"
 import PlacePage from "./pages/PlacePage"
 import BookingsPage from "./pages/BookingsPage"
 import BookingPage from "./pages/BookingPage"
-import Dashboard from "./pages/DashboardPage"
-//COMPONENTS
-import Layout from "./components/Layout"
-import { UserContextProvider } from "./components/UserContext"
 
 
 
@@ -32,8 +29,8 @@ function App() {
           <Route path="/place/:id" element={<PlacePage />} />
           <Route path="/account/bookings" element={<BookingsPage />} />
           <Route path="/account/bookings/:id" element={<BookingPage />} />
+          
         </Route>
-          <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </UserContextProvider>
   )
