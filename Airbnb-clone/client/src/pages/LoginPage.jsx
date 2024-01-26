@@ -25,22 +25,17 @@ const LoginPage = () => {
   }, []);
 
   const onSuccess = async (response) => {
+    console.log("obtengo respuesta",response)
     setUserGoogle(response.profileObj);
-
     try {
-      // Aquí deberías enviar la información necesaria al servidor para gestionar la autenticación con Google.
-      // Puedes ajustar la URL según tus rutas en el backend.
       const { data } = await axios.post(
-        "http://localhost:4000/register", // Ajusta la URL según tu backend
+        "http://localhost:4000/register", 
         {
-          googleId: response.profileObj.googleId,
-          email: response.profileObj.email,
-          name: response.profileObj.name,
-          // Otros datos que puedas necesitar
+          emailGoogle: response.profileObj.email,
+          nameGoogle: response.profileObj.name,
         },
         { withCredentials: true }
       );
-
       setUser(data);
       alert("Login successful");
       setRedirect(true);
@@ -63,8 +58,10 @@ const LoginPage = () => {
   };
 
   const handleLoginSubmit = async (e) => {
+    console.log(event)
     e.preventDefault();
     try {
+      console.log(data)
       const { data } = await axios.post(
         "http://localhost:4000/register",
         {
@@ -120,9 +117,6 @@ const LoginPage = () => {
             </Link>
           </div>
         </form>
-        <div className={userGoogle ? "profile" : "hidden"}>
-          <p>{userGoogle.name}</p>
-        </div>
       </div>
     </div>
   );
