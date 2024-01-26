@@ -1,14 +1,14 @@
 const dotenv = require("dotenv");
 const Place = require("./models/place");
-const axios = require('axios');
+const axios = require("axios");
 
 dotenv.config();
 
 const mercadopagoAxios = axios.create({
-  baseURL: 'https://api.mercadopago.com',
+  baseURL: "https://api.mercadopago.com",
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${process.env.MP_TOKEN}`,
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${process.env.MP_TOKEN}`,
   },
 });
 
@@ -42,7 +42,7 @@ const createOrder = async (req, res) => {
     };
 
     const response = await mercadopagoAxios.post(
-      'https://api.mercadopago.com/checkout/preferences',
+      "https://api.mercadopago.com/checkout/preferences",
       preference
     );
 
@@ -69,7 +69,8 @@ const recieveWebhook = (req, res) => {
   console.log(payment);
 
   if (payment.type === "payment") {
-    mercadopagoAxios.get(`/v1/payments/${payment.data.id}`)
+    mercadopagoAxios
+      .get(`/v1/payments/${payment.data.id}`)
       .then((data) => {
         console.log(data.data);
       })
