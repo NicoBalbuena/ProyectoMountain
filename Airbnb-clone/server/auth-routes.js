@@ -17,7 +17,10 @@ authRouter.get('/login/google/callback', passport.authenticate('google', { failu
     // Aquí podrías realizar acciones adicionales si es necesario
     console.log('Perfil del usuario autenticado:', req.user);
     // Redirección exitosa después de la autenticación con Google
+
     res.redirect('/http://localhost:5173/');
+    res.send(req.user.accessToken);
+
   }
 );
 

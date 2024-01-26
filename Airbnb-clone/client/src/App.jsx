@@ -11,9 +11,6 @@ import PlacePage from "./pages/PlacePage"
 import BookingsPage from "./pages/BookingsPage"
 import BookingPage from "./pages/BookingPage"
 
-
-
-
 function App() {
 
   return (
