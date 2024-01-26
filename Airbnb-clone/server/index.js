@@ -22,6 +22,7 @@ const authRouter = require("./auth-routes");
 const reviewController = require("./review-controller");
 const { registerAndEmail } = require("../server/email-controller");
 const cloudinary = require("./middleware/cloudinary-middleware");
+
 app.use(
   session({
     secret: process.env.JWT_SECRET,
