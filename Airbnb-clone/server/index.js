@@ -356,9 +356,30 @@ app.post("/bookings", async (req, res) => {
 
 app.get("/bookings", async (req, res) => {
   const { token } = req.cookies;
+
+  if (!token) {
+    return res.status(401).json({ error: "Token not provided" });
+  }
+
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+    if (err) {
+      console.error("Error verifying JWT:", err);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    if (!userData || !userData.id) {
+      return res.status(401).json({ error: "Invalid user data in token" });
+    }
+
     const { id } = userData;
-    res.json(await Booking.find({ user: id }).populate("place"));
+
+    try {
+      const bookings = await Booking.find({ user: id }).populate("place");
+      res.json(bookings);
+    } catch (error) {
+      console.error("Error fetching bookings:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   });
 });
 
