@@ -8,6 +8,7 @@ import GoogleLogin from 'react-google-login';
 
 const LoginPage = () => {
     const client_id = "1056894336848-o8gs701t5oahl4ih6hi330t92kth6oa8.apps.googleusercontent.com";
+    // eslint-disable-next-line no-unused-vars
     const [userGoogle, setUserGoogle] = useState({});
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -28,7 +29,7 @@ const LoginPage = () => {
         e.preventDefault();
         try {
             const { data } = await axios.post(
-                "http://localhost:4000/auth/register",
+                "http://localhost:4000/login",
                 {
                     email,
                     password,
