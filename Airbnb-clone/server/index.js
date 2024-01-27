@@ -263,6 +263,13 @@ app.post("/places", cloudinary, (req, res) => {
 app.get("/user-places", (req, res) => {
   const { token } = req.cookies;
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+    if (err) {
+      // Manejar el error, por ejemplo, enviar una respuesta de error
+      res.status(401).json({ error: "Token no válido" });
+      return;
+    }
+
+    // userData está definido
     const { id } = userData;
     res.json(await Place.find({ owner: id }));
   });
@@ -333,10 +340,25 @@ app.get("/places", async (req, res) => {
 app.post("/bookings", async (req, res) => {
   try {
     const { token } = req.cookies;
-    const { place, checkIn, checkOut, numberOfGuests, name, phone, price } =
-      req.body;
+
+    if (!token) {
+      return res.status(401).json({ error: "Token not provided" });
+    }
+
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-      if (err) throw err;
+      if (err) {
+        console.error("Error verifying JWT:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+
+      if (!userData || !userData.id) {
+        return res.status(401).json({ error: "Invalid user data in token" });
+      }
+
+      const { id } = userData;
+
+      const { place, checkIn, checkOut, numberOfGuests, name, phone, price } = req.body;
+
       const bookingDoc = await Booking.create({
         place,
         checkIn,
@@ -345,8 +367,9 @@ app.post("/bookings", async (req, res) => {
         name,
         phone,
         price,
-        user: userData.id,
+        user: id,
       });
+
       res.json(bookingDoc);
     });
   } catch (error) {
@@ -356,9 +379,30 @@ app.post("/bookings", async (req, res) => {
 
 app.get("/bookings", async (req, res) => {
   const { token } = req.cookies;
+
+  if (!token) {
+    return res.status(401).json({ error: "Token not provided" });
+  }
+
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+    if (err) {
+      console.error("Error verifying JWT:", err);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    if (!userData || !userData.id) {
+      return res.status(401).json({ error: "Invalid user data in token" });
+    }
+
     const { id } = userData;
-    res.json(await Booking.find({ user: id }).populate("place"));
+
+    try {
+      const bookings = await Booking.find({ user: id }).populate("place");
+      res.json(bookings);
+    } catch (error) {
+      console.error("Error fetching bookings:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   });
 });
 
