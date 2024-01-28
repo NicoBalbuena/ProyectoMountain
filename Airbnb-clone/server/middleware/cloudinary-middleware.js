@@ -3,7 +3,6 @@ const cloudinary = require("../utils/cloudinary-config");
 async function cloudinaryMiddleware(req, res, next) {
   try {
     let photos;
-
     // Verificar si las fotos están en el cuerpo como JSON
     if (req.body.data && req.body.data.photos) {
       photos = req.body.data.photos;

@@ -22,6 +22,7 @@ const authRouter = require("./auth-routes");
 const reviewController = require("./review-controller");
 const { registerAndEmail } = require("../server/email-controller");
 const cloudinary = require("./middleware/cloudinary-middleware");
+const nodemailer = require("nodemailer");
 
 app.use(
   session({
@@ -48,8 +49,14 @@ app.use(
     origin: "http://localhost:5173",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: "Content-Type,Authorization",
+    optionsSuccessStatus: 204,
   })
 );
+
+// Manejo de errores de conexión a MongoDB
+mongoose.connection.on("error", (err) => {
+  console.error("MongoDB connection error:", err);
+});
 
 app.use("/mp", mercadopagoRoutes);
 app.use("/auth", authRouter);
@@ -58,6 +65,83 @@ mongoose.connect(process.env.MONGO_URL);
 
 app.get("/test", (req, res) => {
   res.json("test ok");
+});
+
+//config del nodemailer
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: process.env.EMAIL_PORT,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+});
+
+app.post("/register", async (req, res) => {
+  try {
+    if (req.body.nameGoogle && req.body.emailGoogle) {
+      // Registro con Google
+      const { nameGoogle, emailGoogle } = req.body;
+      const userDoc = await User.create({
+        nameGoogle,
+        emailGoogle,
+      });
+
+      // Enviar correo de bienvenida
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: emailGoogle,
+        subject: "¡Bienvenido a Mountain Haven - Tu Refugio en la Montaña!",
+        text: `Hola ${nameGoogle},\n\n¡Bienvenido a Mountain Haven!\n\nEstamos encantados de darte la bienvenida a nuestra comunidad de amantes de la naturaleza y aventureros. En Mountain Haven, nos dedicamos a proporcionar experiencias excepcionales en alojamientos encantadores, perfectos para tu escapada a la montaña.\n\nGracias por unirte a nosotros. Tu próximo viaje está a punto de comenzar, y estamos emocionados de ser parte de tus experiencias en la montaña.\n\nYa sea que busques la comodidad de una cabaña acogedora o la vista panorámica desde una suite de lujo, en Mountain Haven encontrarás el refugio perfecto para tus momentos especiales.\n\nSi necesitas ayuda para planificar tu estancia o tienes alguna pregunta, nuestro equipo está aquí para ayudarte. Explora nuestras opciones de alojamiento y descubre la magia que Mountain Haven tiene reservada para ti.\n\n¡Esperamos que disfrutes de tu estancia en nuestro refugio en la montaña!\n\nSaludos cordiales,\n\nEl equipo de Mountain Haven`,
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error("Error al enviar el correo electrónico:", error);
+        } else {
+          console.log(
+            "Correo electrónico enviado exitosamente:",
+            info.response
+          );
+        }
+      });
+
+      res.status(201).json(userDoc);
+    } else {
+      // Registro con correo y contraseña
+      const { name, email, password } = req.body;
+      const salt = bcrypt.genSaltSync(10); // Generar un salt
+      const hashedPassword = bcrypt.hashSync(password, salt); // Hashear la contraseña con el salt generado
+      const userDoc = await User.create({
+        name,
+        email,
+        password: hashedPassword, // Usar la contraseña hasheada
+      });
+
+      // Enviar correo de bienvenida
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "¡Bienvenido a Mountain Haven - Tu Refugio en la Montaña!",
+        text: `Hola ${name},\n\n¡Bienvenido a Mountain Haven!\n\nEstamos encantados de darte la bienvenida a nuestra comunidad de amantes de la naturaleza y aventureros. En Mountain Haven, nos dedicamos a proporcionar experiencias excepcionales en alojamientos encantadores, perfectos para tu escapada a la montaña.\n\nGracias por unirte a nosotros. Tu próximo viaje está a punto de comenzar, y estamos emocionados de ser parte de tus experiencias en la montaña.\n\nYa sea que busques la comodidad de una cabaña acogedora o la vista panorámica desde una suite de lujo, en Mountain Haven encontrarás el refugio perfecto para tus momentos especiales.\n\nSi necesitas ayuda para planificar tu estancia o tienes alguna pregunta, nuestro equipo está aquí para ayudarte. Explora nuestras opciones de alojamiento y descubre la magia que Mountain Haven tiene reservada para ti.\n\n¡Esperamos que disfrutes de tu estancia en nuestro refugio en la montaña!\n\nSaludos cordiales,\n\nEl equipo de Mountain Haven`,
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error("Error al enviar el correo electrónico:", error);
+        } else {
+          console.log(
+            "Correo electrónico enviado exitosamente:",
+            info.response
+          );
+        }
+      });
+
+      res.status(201).json(userDoc);
+    }
+  } catch (error) {
+    res.status(422).json({ error: error.message });
+  }
 });
 
 app.post("/register", registerAndEmail);
@@ -118,6 +202,70 @@ app.post("/uploads-by-link", async (req, res) => {
   }
 });
 
+// Ruta para obtener lugares ordenados por precio ascendente
+app.get("/places/sort-by-price-asc", async (req, res) => {
+  try {
+    console.log("Entrando en la ruta de ordenar por precio ascendente");
+    const places = await Place.find().sort({ price: 1 });
+    console.log("Lugares obtenidos correctamente:", places);
+    res.json(places);
+  } catch (error) {
+    console.error("Error en la ruta de ordenar por precio ascendente:", error);
+    res.status(500).json({
+      error: error.message || "Internal Server Error",
+      stack: error.stack,
+    });
+  }
+});
+
+// Ruta para obtener lugares ordenados por precio descendente
+app.get("/places/sort-by-price-desc", async (req, res) => {
+  try {
+    console.log("Entrando en la ruta de ordenar por precio descendente");
+    const places = await Place.find().sort({ price: -1 });
+    console.log("Lugares obtenidos correctamente:", places);
+    res.json(places);
+  } catch (error) {
+    console.error("Error en la ruta de ordenar por precio descendente:", error);
+    res.status(500).json({
+      error: error.message || "Internal Server Error",
+      stack: error.stack,
+    });
+  }
+});
+
+// Ruta para obtener lugares ordenados por cantidad de huéspedes ascendente
+app.get("/places/sort-by-guests-asc", async (req, res) => {
+  try {
+    const places = await Place.find().sort({ guests: 1 });
+    res.json(places);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Ruta para obtener lugares ordenados por cantidad de huéspedes descendente
+app.get("/places/sort-by-guests-desc", async (req, res) => {
+  try {
+    const places = await Place.find().sort({ guests: -1 });
+    res.json(places);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/places/:placeId/reviews", reviewController.createReview);
+app.get("/places/:placeId/reviews", reviewController.getReviewsByPlace);
+// Rutas para obtener lugares ordenados por valor de revisión asc y desc
+app.get(
+  "/places/sort-by-review-asc",
+  reviewController.getPlacesSortedByReviewAsc
+);
+app.get(
+  "/places/sort-by-review-desc",
+  reviewController.getPlacesSortedByReviewDesc
+);
+
 const photosMiddleware = multer({ dest: "uploads/" });
 app.post(
   "/upload",
@@ -175,6 +323,13 @@ app.post("/places", cloudinary, (req, res) => {
 app.get("/user-places", (req, res) => {
   const { token } = req.cookies;
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+    if (err) {
+      // Manejar el error, por ejemplo, enviar una respuesta de error
+      res.status(401).json({ error: "Token no válido" });
+      return;
+    }
+
+    // userData está definido
     const { id } = userData;
     res.json(await Place.find({ owner: id }));
   });
@@ -245,10 +400,26 @@ app.get("/places", async (req, res) => {
 app.post("/bookings", async (req, res) => {
   try {
     const { token } = req.cookies;
-    const { place, checkIn, checkOut, numberOfGuests, name, phone, price } =
-      req.body;
+
+    if (!token) {
+      return res.status(401).json({ error: "Token not provided" });
+    }
+
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-      if (err) throw err;
+      if (err) {
+        console.error("Error verifying JWT:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+
+      if (!userData || !userData.id) {
+        return res.status(401).json({ error: "Invalid user data in token" });
+      }
+
+      const { id } = userData;
+
+      const { place, checkIn, checkOut, numberOfGuests, name, phone, price } =
+        req.body;
+
       const bookingDoc = await Booking.create({
         place,
         checkIn,
@@ -257,8 +428,9 @@ app.post("/bookings", async (req, res) => {
         name,
         phone,
         price,
-        user: userData.id,
+        user: id,
       });
+
       res.json(bookingDoc);
     });
   } catch (error) {
@@ -268,14 +440,33 @@ app.post("/bookings", async (req, res) => {
 
 app.get("/bookings", async (req, res) => {
   const { token } = req.cookies;
+
+  if (!token) {
+    return res.status(401).json({ error: "Token not provided" });
+  }
+
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+    if (err) {
+      console.error("Error verifying JWT:", err);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    if (!userData || !userData.id) {
+      return res.status(401).json({ error: "Invalid user data in token" });
+    }
+
     const { id } = userData;
-    res.json(await Booking.find({ user: id }).populate("place"));
+
+    try {
+      const bookings = await Booking.find({ user: id }).populate("place");
+      res.json(bookings);
+    } catch (error) {
+      console.error("Error fetching bookings:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   });
 });
 
-app.post("/places/:placeId/reviews", reviewController.createReview);
-app.get("/places/:placeId/reviews", reviewController.getReviewsByPlace);
 // app.get("/places/:placeId", getPlaceById);
 
 app.listen(4000, () => {
