@@ -7,6 +7,7 @@ import { differenceInCalendarDays, format } from "date-fns"
 const BookingPage = () => {
 
   const { id } = useParams()
+  console.log("aca estoy en el booking",id)
 
   const [booking, setBookings] = useState([])
   const [showAllPhotos, setShowAllPhotos] = useState(false)
@@ -14,6 +15,7 @@ const BookingPage = () => {
   useEffect(() => {
     axios.get("http://localhost:4000/bookings", { withCredentials: true })
       .then(res => {
+        console.log("despues de la promesa",id)
         const foundBooking = res.data.find(({ _id }) => _id === id)
         if (foundBooking) {
           setBookings(foundBooking)

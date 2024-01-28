@@ -9,11 +9,12 @@ const PlacePage = () => {
     const { id } = useParams()
     const [place, setPlace] = useState(null)
     const [showAllPhotos, setShowAllPhotos] = useState(false)
-
+    console.log("antes del efecct",id)
     useEffect(() => {
         if (!id) {
+            console.log("if",id)
             return
-        }
+        }console.log("despues del return",id)
         axios.get(`http://localhost:4000/places/${id}`)
             .then(res => {
                 setPlace(res.data)
