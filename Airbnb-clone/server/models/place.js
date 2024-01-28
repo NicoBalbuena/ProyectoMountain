@@ -13,7 +13,7 @@ const placeSchema = new mongoose.Schema({
     guests: Number,
     price: Number,
     reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
-})
+});
 
 const PlaceModel = mongoose.model("Place", placeSchema);
 

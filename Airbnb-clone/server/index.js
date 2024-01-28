@@ -49,8 +49,15 @@ app.use(
     origin: "http://localhost:5173",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: "Content-Type,Authorization",
+    optionsSuccessStatus: 204,
   })
 );
+
+// Manejo de errores de conexión a MongoDB
+mongoose.connection.on('error', err => {
+  console.error('MongoDB connection error:', err);
+});
+
 
 app.use("/mp", mercadopagoRoutes);
 app.use("/auth", authRouter);
@@ -205,6 +212,61 @@ app.post("/uploads-by-link", async (req, res) => {
     res.status(404).json("error");
   }
 });
+
+
+// Ruta para obtener lugares ordenados por precio ascendente
+app.get("/places/sort-by-price-asc", async (req, res) => {
+  try {
+    console.log("Entrando en la ruta de ordenar por precio ascendente");
+    const places = await Place.find().sort({ price: 1 });
+    console.log("Lugares obtenidos correctamente:", places);
+    res.json(places);
+  } catch (error) {
+    console.error("Error en la ruta de ordenar por precio ascendente:", error);
+    res.status(500).json({ error: error.message || "Internal Server Error", stack: error.stack });
+  }
+});
+
+// Ruta para obtener lugares ordenados por precio descendente
+app.get("/places/sort-by-price-desc", async (req, res) => {
+  try {
+    console.log("Entrando en la ruta de ordenar por precio descendente");
+    const places = await Place.find().sort({ price: -1 });
+    console.log("Lugares obtenidos correctamente:", places);
+    res.json(places);
+  } catch (error) {
+    console.error("Error en la ruta de ordenar por precio descendente:", error);
+    res.status(500).json({ error: error.message || "Internal Server Error", stack: error.stack });
+  }
+});
+
+// Ruta para obtener lugares ordenados por cantidad de huéspedes ascendente
+app.get("/places/sort-by-guests-asc", async (req, res) => {
+  try {
+    const places = await Place.find().sort({ guests: 1 });
+    res.json(places);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Ruta para obtener lugares ordenados por cantidad de huéspedes descendente
+app.get("/places/sort-by-guests-desc", async (req, res) => {
+  try {
+    const places = await Place.find().sort({ guests: -1 });
+    res.json(places);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/places/:placeId/reviews", reviewController.createReview);
+app.get("/places/:placeId/reviews", reviewController.getReviewsByPlace);
+// Rutas para obtener lugares ordenados por valor de revisión asc y desc
+app.get("/places/sort-by-review-asc", reviewController.getPlacesSortedByReviewAsc);
+app.get("/places/sort-by-review-desc", reviewController.getPlacesSortedByReviewDesc);
+
+
 
 const photosMiddleware = multer({ dest: "uploads/" });
 app.post(
@@ -406,9 +468,12 @@ app.get("/bookings", async (req, res) => {
   });
 });
 
-app.post("/places/:placeId/reviews", reviewController.createReview);
-app.get("/places/:placeId/reviews", reviewController.getReviewsByPlace);
+
 // app.get("/places/:placeId", getPlaceById);
+
+
+
+
 
 app.listen(4000, () => {
   console.log("Conectado ponete a codear");
