@@ -44,12 +44,54 @@ const IndexPage = () => {
     setPageNumber(selected);
   };
 
+  const handleClearFilters = async () => {
+    fetchPlaces(); // Volvemos a obtener los lugares sin ningún filtro
+  };
+
+  // Función para filtrar lugares por rating promedio
+  const filterByAvgRating = async (avgRating) => {
+    try {
+      const response = await axios.get(`http://localhost:4000/places/by-avg-rating/${avgRating}`);
+      setPlaces(response.data); // Actualizamos el estado con los lugares filtrados
+    } catch (error) {
+      console.error("Error al filtrar por rating promedio:", error);
+    }
+  };
+
+  // Función para filtrar lugares por cantidad mínima de huéspedes
+  const filterByMinGuests = async (minGuests) => {
+    try {
+      const response = await axios.get(`http://localhost:4000/places/min-guests/${minGuests}`);
+      setPlaces(response.data); // Actualizamos el estado con los lugares filtrados
+    } catch (error) {
+      console.error("Error al filtrar por cantidad mínima de huéspedes:", error);
+    }
+  };
+
+  // Función para filtrar lugares disponibles por fechas de check-in y check-out
+  const filterByAvailability = async (checkIn, checkOut) => {
+    try {
+      const response = await axios.get(`http://localhost:4000/places/available/${checkIn}/${checkOut}`);
+      setPlaces(response.data); // Actualizamos el estado con los lugares filtrados
+    } catch (error) {
+      console.error("Error al filtrar por disponibilidad:", error);
+    }
+  };
+
   return (
     <div>
       <div>
         <Banner />
       </div>
       <div>
+        <h1>Filtros</h1>
+        <button onClick={() => filterByAvgRating(5)}>Filtrar por rating promedio (5 estrellas)</button>
+        <button onClick={() => filterByMinGuests(4)}>Filtrar por cantidad mínima de huéspedes (4 o más)</button>
+        <button onClick={() => filterByAvailability("2024-02-01", "2024-02-07")}>Filtrar por disponibilidad (01/02/2024 - 07/02/2024)</button>
+        <button onClick={handleClearFilters}>Limpiar filtros</button>
+      </div>
+      <div>
+        <h1>Ordenamientos</h1>
         <select onChange={(e) => {
           const value = e.target.value;
           if (value === "clear") {
