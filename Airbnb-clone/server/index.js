@@ -266,6 +266,7 @@ app.get("/places/:placeId/reviews", reviewController.getReviewsByPlace);
 app.get("/places/by-avg-rating/:avgRating", filtros.getPlacesByAvgRating);
 app.get("/places/min-guests/:minGuests", filtros.getPlacesByGuests);
 app.get("/places/available/:checkIn/:checkOut", filtros.getAvailablePlaces);
+app.get("/places/filter", filtros.getFilteredPlaces)
 
 app.get(
   "/places/sort-by-review-desc",
