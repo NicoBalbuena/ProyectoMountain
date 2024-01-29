@@ -22,8 +22,8 @@ const authRouter = require("./auth-routes");
 const reviewController = require("./review-controller");
 const { registerAndEmail } = require("../server/email-controller");
 const cloudinary = require("./middleware/cloudinary-middleware");
-const nodemailer = require('nodemailer');
-const filtros = require("./filtros")
+const nodemailer = require("nodemailer");
+const filtros = require("./filtros");
 
 app.use(
   session({
@@ -55,10 +55,10 @@ app.use(
 );
 
 // Manejo de errores de conexión a MongoDB
-mongoose.connection.on('error', err => {
-  console.error('MongoDB connection error:', err);
-});
 
+mongoose.connection.on("error", (err) => {
+  console.error("MongoDB connection error:", err);
+});
 
 app.use("/mp", mercadopagoRoutes);
 app.use("/auth", authRouter);
@@ -66,82 +66,85 @@ app.use("/auth", authRouter);
 mongoose.connect(process.env.MONGO_URL);
 
 app.get("/test", (req, res) => {
-
-    res.json("test ok")
-})
-
+  res.json("test ok");
+});
 
 //config del nodemailer
 const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
-    }
+  host: process.env.EMAIL_HOST,
+  port: process.env.EMAIL_PORT,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+  },
 });
 
 app.post("/register", async (req, res) => {
   try {
-      if (req.body.nameGoogle && req.body.emailGoogle) {
-          // Registro con Google
-          const { nameGoogle, emailGoogle } = req.body;
-          const userDoc = await User.create({
-              nameGoogle,
-              emailGoogle
-          });
+    if (req.body.nameGoogle && req.body.emailGoogle) {
+      // Registro con Google
+      const { nameGoogle, emailGoogle } = req.body;
+      const userDoc = await User.create({
+        nameGoogle,
+        emailGoogle,
+      });
 
-          // Enviar correo de bienvenida
-          const mailOptions = {
-              from: process.env.EMAIL_USER,
-              to: emailGoogle,
-              subject: '¡Bienvenido a Mountain Haven - Tu Refugio en la Montaña!',
-              text: `Hola ${nameGoogle},\n\n¡Bienvenido a Mountain Haven!\n\nEstamos encantados de darte la bienvenida a nuestra comunidad de amantes de la naturaleza y aventureros. En Mountain Haven, nos dedicamos a proporcionar experiencias excepcionales en alojamientos encantadores, perfectos para tu escapada a la montaña.\n\nGracias por unirte a nosotros. Tu próximo viaje está a punto de comenzar, y estamos emocionados de ser parte de tus experiencias en la montaña.\n\nYa sea que busques la comodidad de una cabaña acogedora o la vista panorámica desde una suite de lujo, en Mountain Haven encontrarás el refugio perfecto para tus momentos especiales.\n\nSi necesitas ayuda para planificar tu estancia o tienes alguna pregunta, nuestro equipo está aquí para ayudarte. Explora nuestras opciones de alojamiento y descubre la magia que Mountain Haven tiene reservada para ti.\n\n¡Esperamos que disfrutes de tu estancia en nuestro refugio en la montaña!\n\nSaludos cordiales,\n\nEl equipo de Mountain Haven`
-          };
+      // Enviar correo de bienvenida
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: emailGoogle,
+        subject: "¡Bienvenido a Mountain Haven - Tu Refugio en la Montaña!",
+        text: `Hola ${nameGoogle},\n\n¡Bienvenido a Mountain Haven!\n\nEstamos encantados de darte la bienvenida a nuestra comunidad de amantes de la naturaleza y aventureros. En Mountain Haven, nos dedicamos a proporcionar experiencias excepcionales en alojamientos encantadores, perfectos para tu escapada a la montaña.\n\nGracias por unirte a nosotros. Tu próximo viaje está a punto de comenzar, y estamos emocionados de ser parte de tus experiencias en la montaña.\n\nYa sea que busques la comodidad de una cabaña acogedora o la vista panorámica desde una suite de lujo, en Mountain Haven encontrarás el refugio perfecto para tus momentos especiales.\n\nSi necesitas ayuda para planificar tu estancia o tienes alguna pregunta, nuestro equipo está aquí para ayudarte. Explora nuestras opciones de alojamiento y descubre la magia que Mountain Haven tiene reservada para ti.\n\n¡Esperamos que disfrutes de tu estancia en nuestro refugio en la montaña!\n\nSaludos cordiales,\n\nEl equipo de Mountain Haven`,
+      };
 
-          transporter.sendMail(mailOptions, (error, info) => {
-              if (error) {
-                  console.error('Error al enviar el correo electrónico:', error);
-              } else {
-                  console.log('Correo electrónico enviado exitosamente:', info.response);
-              }
-          });
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error("Error al enviar el correo electrónico:", error);
+        } else {
+          console.log(
+            "Correo electrónico enviado exitosamente:",
+            info.response
+          );
+        }
+      });
 
-          res.status(201).json(userDoc);
-      } else {
-          // Registro con correo y contraseña
-          const { name, email, password } = req.body;
-          const salt = bcrypt.genSaltSync(10); // Generar un salt
-          const hashedPassword = bcrypt.hashSync(password, salt); // Hashear la contraseña con el salt generado
-          const userDoc = await User.create({
-              name,
-              email,
-              password: hashedPassword, // Usar la contraseña hasheada
-          });
+      res.status(201).json(userDoc);
+    } else {
+      // Registro con correo y contraseña
+      const { name, email, password } = req.body;
+      const salt = bcrypt.genSaltSync(10); // Generar un salt
+      const hashedPassword = bcrypt.hashSync(password, salt); // Hashear la contraseña con el salt generado
+      const userDoc = await User.create({
+        name,
+        email,
+        password: hashedPassword, // Usar la contraseña hasheada
+      });
 
-          // Enviar correo de bienvenida
-          const mailOptions = {
-              from: process.env.EMAIL_USER,
-              to: email,
-              subject: '¡Bienvenido a Mountain Haven - Tu Refugio en la Montaña!',
-              text: `Hola ${name},\n\n¡Bienvenido a Mountain Haven!\n\nEstamos encantados de darte la bienvenida a nuestra comunidad de amantes de la naturaleza y aventureros. En Mountain Haven, nos dedicamos a proporcionar experiencias excepcionales en alojamientos encantadores, perfectos para tu escapada a la montaña.\n\nGracias por unirte a nosotros. Tu próximo viaje está a punto de comenzar, y estamos emocionados de ser parte de tus experiencias en la montaña.\n\nYa sea que busques la comodidad de una cabaña acogedora o la vista panorámica desde una suite de lujo, en Mountain Haven encontrarás el refugio perfecto para tus momentos especiales.\n\nSi necesitas ayuda para planificar tu estancia o tienes alguna pregunta, nuestro equipo está aquí para ayudarte. Explora nuestras opciones de alojamiento y descubre la magia que Mountain Haven tiene reservada para ti.\n\n¡Esperamos que disfrutes de tu estancia en nuestro refugio en la montaña!\n\nSaludos cordiales,\n\nEl equipo de Mountain Haven`
-          };
+      // Enviar correo de bienvenida
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "¡Bienvenido a Mountain Haven - Tu Refugio en la Montaña!",
+        text: `Hola ${name},\n\n¡Bienvenido a Mountain Haven!\n\nEstamos encantados de darte la bienvenida a nuestra comunidad de amantes de la naturaleza y aventureros. En Mountain Haven, nos dedicamos a proporcionar experiencias excepcionales en alojamientos encantadores, perfectos para tu escapada a la montaña.\n\nGracias por unirte a nosotros. Tu próximo viaje está a punto de comenzar, y estamos emocionados de ser parte de tus experiencias en la montaña.\n\nYa sea que busques la comodidad de una cabaña acogedora o la vista panorámica desde una suite de lujo, en Mountain Haven encontrarás el refugio perfecto para tus momentos especiales.\n\nSi necesitas ayuda para planificar tu estancia o tienes alguna pregunta, nuestro equipo está aquí para ayudarte. Explora nuestras opciones de alojamiento y descubre la magia que Mountain Haven tiene reservada para ti.\n\n¡Esperamos que disfrutes de tu estancia en nuestro refugio en la montaña!\n\nSaludos cordiales,\n\nEl equipo de Mountain Haven`,
+      };
 
-          transporter.sendMail(mailOptions, (error, info) => {
-              if (error) {
-                  console.error('Error al enviar el correo electrónico:', error);
-              } else {
-                  console.log('Correo electrónico enviado exitosamente:', info.response);
-              }
-          });
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error("Error al enviar el correo electrónico:", error);
+        } else {
+          console.log(
+            "Correo electrónico enviado exitosamente:",
+            info.response
+          );
+        }
+      });
 
-          res.status(201).json(userDoc);
-      }
+      res.status(201).json(userDoc);
+    }
   } catch (error) {
-      res.status(422).json({ error: error.message });
+    res.status(422).json({ error: error.message });
   }
 });
-
 
 app.post("/register", registerAndEmail);
 
@@ -201,7 +204,6 @@ app.post("/uploads-by-link", async (req, res) => {
   }
 });
 
-
 // Ruta para obtener lugares ordenados por precio ascendente
 app.get("/places/sort-by-price-asc", async (req, res) => {
   try {
@@ -211,7 +213,11 @@ app.get("/places/sort-by-price-asc", async (req, res) => {
     res.json(places);
   } catch (error) {
     console.error("Error en la ruta de ordenar por precio ascendente:", error);
-    res.status(500).json({ error: error.message || "Internal Server Error", stack: error.stack });
+
+    res.status(500).json({
+      error: error.message || "Internal Server Error",
+      stack: error.stack,
+    });
   }
 });
 
@@ -224,7 +230,11 @@ app.get("/places/sort-by-price-desc", async (req, res) => {
     res.json(places);
   } catch (error) {
     console.error("Error en la ruta de ordenar por precio descendente:", error);
-    res.status(500).json({ error: error.message || "Internal Server Error", stack: error.stack });
+
+    res.status(500).json({
+      error: error.message || "Internal Server Error",
+      stack: error.stack,
+    });
   }
 });
 
@@ -251,36 +261,41 @@ app.get("/places/sort-by-guests-desc", async (req, res) => {
 app.post("/places/:placeId/reviews", reviewController.createReview);
 app.get("/places/:placeId/reviews", reviewController.getReviewsByPlace);
 // Rutas para obtener lugares ordenados por valor de revisión asc y desc
-app.get("/places/sort-by-review-asc", reviewController.getPlacesSortedByReviewAsc);
-app.get("/places/sort-by-review-desc", reviewController.getPlacesSortedByReviewDesc);
 
 //Rutas para filtros
 app.get("/places/by-avg-rating/:avgRating", filtros.getPlacesByAvgRating);
 app.get("/places/min-guests/:minGuests", filtros.getPlacesByGuests);
 app.get("/places/available/:checkIn/:checkOut", filtros.getAvailablePlaces);
 
+app.get(
+  "/places/sort-by-review-desc",
+  reviewController.getPlacesSortedByReviewDesc
+);
 
-
+//uploads
 const photosMiddleware = multer({ dest: "uploads/" });
 app.post(
   "/upload",
   photosMiddleware.array("photos", 100),
   cloudinary,
   (req, res) => {
-    const uploadedFiles = [];
-    for (let i = 0; i < req.files.length; i++) {
-      const { path, originalname } = req.files[i];
-      const parts = originalname.split(".");
-      const ext = parts[parts.length - 1];
-      const newPath = "uploads/" + Date.now() + "." + ext; // Nueva ruta sin la barra invertida
-      fs.copyFileSync(path, newPath);
-      fs.unlinkSync(path); // Elimina el archivo original
-      uploadedFiles.push(newPath.replace("uploads/", ""));
+    let uploadedFiles = [];
+    // Verificar si las fotos están en el cuerpo de la solicitud como URLs de Cloudinary
+    if (req.body.data && req.body.data.photos) {
+      uploadedFiles = req.body.data.photos;
+    } else if (req.body.photos) {
+      // Si las fotos están en el cuerpo de la solicitud como URLs de Cloudinary (modo file)
+      uploadedFiles = req.body.photos;
+    } else {
+      // Si las fotos no están en el cuerpo de la solicitud, asumir que están en los archivos cargados
+      uploadedFiles = req.files.map((file) => file.path);
     }
+    console.log(uploadedFiles);
     res.json(uploadedFiles);
   }
 );
 
+//places-post
 app.post("/places", cloudinary, (req, res) => {
   const { token } = req.cookies;
   const { data } = req.body;
@@ -296,6 +311,7 @@ app.post("/places", cloudinary, (req, res) => {
     guests,
     price,
   } = data;
+  console.log(photos);
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
     if (err) throw err;
     const placeDoc = await Place.create({
@@ -412,7 +428,8 @@ app.post("/bookings", async (req, res) => {
 
       const { id } = userData;
 
-      const { place, checkIn, checkOut, numberOfGuests, name, phone, price } = req.body;
+      const { place, checkIn, checkOut, numberOfGuests, name, phone, price } =
+        req.body;
 
       const bookingDoc = await Booking.create({
         place,
@@ -461,12 +478,7 @@ app.get("/bookings", async (req, res) => {
   });
 });
 
-
 // app.get("/places/:placeId", getPlaceById);
-
-
-
-
 
 app.listen(4000, () => {
   console.log("Conectado ponete a codear");

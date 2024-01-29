@@ -10,6 +10,8 @@ import PlacesFormPage from "./pages/PlacesFormPage"
 import PlacePage from "./pages/PlacePage"
 import BookingsPage from "./pages/BookingsPage"
 import BookingPage from "./pages/BookingPage"
+import Dashboard from "./pages/DashboardPage"
+
 
 function App() {
 
@@ -28,6 +30,12 @@ function App() {
           <Route path="/account/bookings" element={<BookingsPage />} />
           <Route path="/account/bookings/:id" element={<BookingPage />} />
         </Route>
+      
+          <Route path="/dashboard" element={<Dashboard/>}>
+          <Route path="/dashboard/users" element={<Dashboard/>}/>
+          <Route path="/dashboard/lodgins" element={<Dashboard/>}/>
+          <Route path="/dashboard/owners" element={<Dashboard/>}/>
+          </Route>
       </Routes>
     </UserContextProvider>
   )

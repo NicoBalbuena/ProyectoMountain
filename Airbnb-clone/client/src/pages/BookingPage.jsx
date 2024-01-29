@@ -31,7 +31,7 @@ const BookingPage = () => {
 
   if (showAllPhotos) {
     return (
-      <div className="absolute inset-0 bg-black text-white min-h-screen">
+      <div className="absolute inset-0 z-50 text-white min-h-screen">
         <div className="bg-black p-8 grid gap-4">
           <div>
             <h2 className="text-3xl mr-48">Photos of {booking?.place?.title}</h2>
@@ -45,7 +45,7 @@ const BookingPage = () => {
           <div className="flex flex-col items-center gap-4">
             {booking?.place?.photos?.length > 0 && booking?.place?.photos.map((photo, index) => (
               <div className="" key={index}>
-                <img className="w-[800px]" src={`http://localhost:4000/uploads/${photo}`} alt="" />
+                <img className="w-[800px]" src={`${photo}`} alt="" />
               </div>
             ))}
           </div>
@@ -70,17 +70,17 @@ const BookingPage = () => {
           <div>
             {booking?.place?.photos?.[0] && (
               <div>
-                <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover w-full" src={`http://localhost:4000/uploads/${booking?.place?.photos[0]}`} alt="" />
+                <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover w-full" src={`${booking?.place?.photos[0]}`} alt="" />
               </div>
             )}
           </div>
           <div className="grid">
             {booking?.place?.photos?.[1] && (
-              <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover w-full" src={`http://localhost:4000/uploads/${booking?.place?.photos[1]}`} alt="" />
+              <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover w-full" src={`${booking?.place?.photos[1]}`} alt="" />
             )}
             <div className="overflow-hidden">
               {booking?.place?.photos?.[2] && (
-                <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover relative top-2 w-full" src={`http://localhost:4000/uploads/${booking?.place?.photos[2]}`} alt="" />
+                <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover relative top-2 w-full" src={`${booking?.place?.photos[2]}`} alt="" />
               )}
             </div>
           </div>
