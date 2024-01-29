@@ -9,7 +9,7 @@ const linksClasses =
 
 export const SideBar = () => {
   return (
-    <aside className="flex flex-col bg-neutral-900 w-60 p-3 text-white">
+    <aside className="flex flex-col bg-neutral-900 w-60 p-3 max-h-screen text-white sticky top-0">
       <section className="flex items-center gap-2 px-1 py-3">
         <IoHome fontSize={25} />
         <span className="text-neutral-100 text-lg">MountainHaven</span>
