@@ -11,7 +11,7 @@ const Dashboard = () => {
         <section className="flex flex-col gap-4 ">
           <DashboardState />
           <TransactionChart/>
-            </section>
+          </section>
       </div>
     </main>
   );
