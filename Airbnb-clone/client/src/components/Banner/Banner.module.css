@@ -1,13 +1,11 @@
 .banner {
     display: flex;
-    align-items: center;
     background: url("../../assets/cabaña.jpg") center center;
     background-repeat: no-repeat;
     background-size: 100% 120%; 
-    height: 70vh;
+    height: 55vh;
     position: relative;
     object-fit: cover;
-    margin-top: 20px;
 }
 
 .banner_info {

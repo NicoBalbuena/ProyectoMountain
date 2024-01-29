@@ -55,7 +55,8 @@ const BookingPage = () => {
   }
 
   return (
-    <div className="mt-4 bg-gray-100 -mx-8 px-8 pt-8">
+    <div className="mt-4 px-8 mx-5 mb-[150px]">
+      <hr />
       <h1 className="text-3xl">{booking?.place?.title}</h1>
       <a className="flex gap-1 my-3 font-semibold underline" rel="noopener noreferrer" target="_blank" href={`https://maps.google.com/?q=${booking?.place?.address}`}>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">

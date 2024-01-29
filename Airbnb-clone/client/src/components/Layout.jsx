@@ -1,14 +1,15 @@
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Banner from "./Banner/Banner";
+import Footer from "./Footer";
 
 
 const Layout = () => {
     return (
-        <div className="py-4 px-8 flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen">
             <Header />
-            
             <Outlet />
+            <Footer/>
         </div>
     )
 }

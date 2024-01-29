@@ -29,7 +29,7 @@ const BookingWidget = ({ place }) => {
 
     const bookThisPlace = async () => {
         const response = await axios.post("http://localhost:4000/bookings", { checkIn,
-         checkOut, numberOfGuests, name, phone, place: place._id, price: numberOfNights * place.price }, { withCredentials: true })
+         checkOut, numberOfGuests, name, phone, place: place._id, price: numberOfNights * place.price * numberOfGuests }, { withCredentials: true })
         const bookingId = response.data._id
         setRedirect(`/account/bookings/${bookingId}`)
     }
@@ -39,7 +39,7 @@ const BookingWidget = ({ place }) => {
       if (method === "mercadopago") {
           try {
               // Calcular el precio total basado en el número de noches seleccionadas y el precio del lugar
-              const totalPrice = numberOfNights * place.price;
+              const totalPrice = numberOfNights * place.price * numberOfGuests;
   
               const response = await axios.post(
                   `http://localhost:4000/mp/create-order/${place._id}`,
@@ -91,7 +91,7 @@ const BookingWidget = ({ place }) => {
                 </div>
                 <div className="py-3 px-4 border-t">
                     <label>Number of guests</label>
-                    <input type="number" value={numberOfGuests} onChange={ev => setNumberOfGuests(ev.target.value)} />
+                    <input type="number" min={1} max={place.guests} value={numberOfGuests} onChange={ev => setNumberOfGuests(ev.target.value)} />
                 </div>
                 {numberOfNights > 0 && (
                     <div className="py-3 px-4 border-t">
@@ -116,7 +116,7 @@ const BookingWidget = ({ place }) => {
             <button onClick={bookThisPlace} className="primary mt-4">
                 Book this place
                 {numberOfNights > 0 && (
-                    <span> ${numberOfNights * place.price}</span>
+                    <span> for ${numberOfNights * place.price * numberOfGuests} for {numberOfNights} night</span>
                 )}
             </button>
         </div>

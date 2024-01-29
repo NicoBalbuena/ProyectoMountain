@@ -130,9 +130,9 @@ const PlacesFormPage = () => {
   console.log(input.photosLink, "kkkkkkkkkkkkkkkk");
 
   return (
-    <div>
+    <div className="mb-[150px]">
       <AccountNav />
-      <form onSubmit={savePlace}>
+      <form onSubmit={savePlace} className="mx-52">
         <h2 className="text-2xl mt-4">Title</h2>
         <input type="text" placeholder="title, for example: My lovely apt" name="title" value={input.title} onChange={handleChange} />
         <h2 className="text-2xl mt-4">Address</h2>

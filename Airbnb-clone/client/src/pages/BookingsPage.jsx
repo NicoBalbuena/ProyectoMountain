@@ -17,7 +17,7 @@ const BookingsPage = () => {
     }, [])
 
     return (
-        <div>
+        <div className="mb-[150px]">
             <AccountNav />
             <div className="">
                 {bookings?.length > 0 && bookings.map((booking, index) => (

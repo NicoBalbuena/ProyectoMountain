@@ -9,12 +9,12 @@ const PlacePage = () => {
     const { id } = useParams()
     const [place, setPlace] = useState(null)
     const [showAllPhotos, setShowAllPhotos] = useState(false)
-    console.log("antes del efecct",id)
+    console.log("antes del efecct", id)
     useEffect(() => {
         if (!id) {
-            console.log("if",id)
+            console.log("if", id)
             return
-        }console.log("despues del return",id)
+        } console.log("despues del return", id)
         axios.get(`http://localhost:4000/places/${id}`)
             .then(res => {
                 setPlace(res.data)
@@ -36,18 +36,21 @@ const PlacePage = () => {
                             Close photos
                         </button>
                     </div>
-                    {place?.photos?.length > 0 && place.photos.map((photo, index) => (
-                        <div key={index}>
-                            <img src={`http://localhost:4000/uploads/${photo}`} alt="" />
-                        </div>
-                    ))}
+                    <div className="flex flex-col items-center gap-4">
+                        {place?.photos?.length > 0 && place.photos.map((photo, index) => (
+                            <div key={index}>
+                                <img className="w-[800px]" src={`http://localhost:4000/uploads/${photo}`} alt="" />
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         )
     }
 
     return (
-        <div className="mt-4 bg-gray-100 -mx-8 px-8 pt-8">
+        <div className="mt-4 px-8 mx-5 mb-[150px]">
+            <hr />
             <h1 className="text-3xl">{place.title}</h1>
             <a className="flex gap-1 my-3 font-semibold underline" rel="noopener noreferrer" target="_blank" href={`https://maps.google.com/?q=${place.address}`}>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
