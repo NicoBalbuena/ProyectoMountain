@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Banner from "../components/Banner/Banner";
 import ReactPaginate from "react-paginate";
-import "./styles.css";
+import "./styles.css"; // Importa el archivo de estilos CSS
 
 const IndexPage = () => {
   const [places, setPlaces] = useState([]);
@@ -36,16 +36,14 @@ const IndexPage = () => {
 
   const handleClearSort = async () => {
     fetchPlaces(); // Volvemos a obtener los lugares sin ningún ordenamiento
+    setSortedPlaces([]); // Restablecemos los lugares ordenados a un arreglo vacío
   };
+  
 
   const pageCount = Math.ceil(places.length / placesPerPage);
 
   const changePage = ({ selected }) => {
     setPageNumber(selected);
-  };
-
-  const handleClearFilters = async () => {
-    fetchPlaces(); // Volvemos a obtener los lugares sin ningún filtro
   };
 
   // Función para filtrar lugares por rating promedio
@@ -78,6 +76,11 @@ const IndexPage = () => {
     }
   };
 
+  //limpiar filtros
+  const handleClearFilters = async () => {
+    fetchPlaces(); // Volvemos a obtener los lugares sin ningún filtro
+  };
+
   return (
     <div>
       <div>
@@ -85,13 +88,11 @@ const IndexPage = () => {
       </div>
       <div>
         <h1>Filtros</h1>
-        <button onClick={() => filterByAvgRating(5)}>Filtrar por rating promedio (5 estrellas)</button>
-        <button onClick={() => filterByMinGuests(4)}>Filtrar por cantidad mínima de huéspedes (4 o más)</button>
-        <button onClick={() => filterByAvailability("2024-02-01", "2024-02-07")}>Filtrar por disponibilidad (01/02/2024 - 07/02/2024)</button>
-        <button onClick={handleClearFilters}>Limpiar filtros</button>
+        <button onClick={() => filterByAvgRating(5)}>Filter by rating promedio (5 estrellas)</button>
+        <button onClick={() => filterByMinGuests(4)}>Filter by cantidad mínima de huéspedes (4 o más)</button>
+        <button onClick={() => filterByAvailability("2024-02-01", "2024-02-07")}>Filtrar por disponibilidad </button>
       </div>
       <div>
-        <h1>Ordenamientos</h1>
         <select onChange={(e) => {
           const value = e.target.value;
           if (value === "clear") {
@@ -107,9 +108,10 @@ const IndexPage = () => {
           <option value="guests-desc">Huéspedes (Desc)</option>
           <option value="review-asc">Review (Asc)</option>
           <option value="review-desc">Review (Desc)</option>
-          <option value="clear">Clear</option>
         </select>
+        
       </div>
+      <button onClick={handleClearSort}>Clear</button>
       <div className="mt-8 grid gap-x-6 gap-y-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {(sortedPlaces.length > 0 ? sortedPlaces : places)
           .slice(pagesVisited, pagesVisited + placesPerPage)
@@ -141,7 +143,6 @@ const IndexPage = () => {
           activeClassName={"pagination__link--active"}
         />
       </div>
-      
     </div>
   );
 };
