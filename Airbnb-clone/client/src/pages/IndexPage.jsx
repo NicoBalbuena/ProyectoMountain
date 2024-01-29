@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Banner from "../components/Banner/Banner";
 import ReactPaginate from "react-paginate";
-import "./styles.css";
+import "./styles.css"; // Importa el archivo de estilos CSS
 
 const IndexPage = () => {
   const [places, setPlaces] = useState([]);
@@ -36,7 +36,9 @@ const IndexPage = () => {
 
   const handleClearSort = async () => {
     fetchPlaces(); // Volvemos a obtener los lugares sin ningún ordenamiento
+    setSortedPlaces([]); // Restablecemos los lugares ordenados a un arreglo vacío
   };
+  
 
   const pageCount = Math.ceil(places.length / placesPerPage);
 
@@ -44,10 +46,51 @@ const IndexPage = () => {
     setPageNumber(selected);
   };
 
+  // Función para filtrar lugares por rating promedio
+  const filterByAvgRating = async (avgRating) => {
+    try {
+      const response = await axios.get(`http://localhost:4000/places/by-avg-rating/${avgRating}`);
+      setPlaces(response.data); // Actualizamos el estado con los lugares filtrados
+    } catch (error) {
+      console.error("Error al filtrar por rating promedio:", error);
+    }
+  };
+
+  // Función para filtrar lugares por cantidad mínima de huéspedes
+  const filterByMinGuests = async (minGuests) => {
+    try {
+      const response = await axios.get(`http://localhost:4000/places/min-guests/${minGuests}`);
+      setPlaces(response.data); // Actualizamos el estado con los lugares filtrados
+    } catch (error) {
+      console.error("Error al filtrar por cantidad mínima de huéspedes:", error);
+    }
+  };
+
+  // Función para filtrar lugares disponibles por fechas de check-in y check-out
+  const filterByAvailability = async (checkIn, checkOut) => {
+    try {
+      const response = await axios.get(`http://localhost:4000/places/available/${checkIn}/${checkOut}`);
+      setPlaces(response.data); // Actualizamos el estado con los lugares filtrados
+    } catch (error) {
+      console.error("Error al filtrar por disponibilidad:", error);
+    }
+  };
+
+  //limpiar filtros
+  const handleClearFilters = async () => {
+    fetchPlaces(); // Volvemos a obtener los lugares sin ningún filtro
+  };
+
   return (
     <div>
       <div>
         <Banner />
+      </div>
+      <div>
+        <h1>Filtros</h1>
+        <button onClick={() => filterByAvgRating(5)}>Filter by rating promedio (5 estrellas)</button>
+        <button onClick={() => filterByMinGuests(4)}>Filter by cantidad mínima de huéspedes (4 o más)</button>
+        <button onClick={() => filterByAvailability("2024-02-01", "2024-02-07")}>Filtrar por disponibilidad </button>
       </div>
       <div>
         <select onChange={(e) => {
@@ -65,9 +108,10 @@ const IndexPage = () => {
           <option value="guests-desc">Huéspedes (Desc)</option>
           <option value="review-asc">Review (Asc)</option>
           <option value="review-desc">Review (Desc)</option>
-          <option value="clear">Clear</option>
         </select>
+        
       </div>
+      <button onClick={handleClearSort}>Clear</button>
       <div className="mt-8 grid gap-x-6 gap-y-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {(sortedPlaces.length > 0 ? sortedPlaces : places)
           .slice(pagesVisited, pagesVisited + placesPerPage)
@@ -99,7 +143,6 @@ const IndexPage = () => {
           activeClassName={"pagination__link--active"}
         />
       </div>
-      
     </div>
   );
 };
