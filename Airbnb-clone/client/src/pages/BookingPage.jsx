@@ -7,6 +7,7 @@ import { differenceInCalendarDays, format } from "date-fns"
 const BookingPage = () => {
 
   const { id } = useParams()
+  console.log("aca estoy en el booking",id)
 
   const [booking, setBookings] = useState([])
   const [showAllPhotos, setShowAllPhotos] = useState(false)
@@ -14,6 +15,7 @@ const BookingPage = () => {
   useEffect(() => {
     axios.get("http://localhost:4000/bookings", { withCredentials: true })
       .then(res => {
+        console.log("despues de la promesa",id)
         const foundBooking = res.data.find(({ _id }) => _id === id)
         if (foundBooking) {
           setBookings(foundBooking)
@@ -43,7 +45,7 @@ const BookingPage = () => {
           <div className="flex flex-col items-center gap-4">
             {booking?.place?.photos?.length > 0 && booking?.place?.photos.map((photo, index) => (
               <div className="" key={index}>
-                <img className="w-[800px]" src={`http://localhost:4000/uploads/${photo}`} alt="" />
+                <img className="w-[800px]" src={`${photo}`} alt="" />
               </div>
             ))}
           </div>
@@ -67,17 +69,17 @@ const BookingPage = () => {
           <div>
             {booking?.place?.photos?.[0] && (
               <div>
-                <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover w-full" src={`http://localhost:4000/uploads/${booking?.place?.photos[0]}`} alt="" />
+                <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover w-full" src={`${booking?.place?.photos[0]}`} alt="" />
               </div>
             )}
           </div>
           <div className="grid">
             {booking?.place?.photos?.[1] && (
-              <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover w-full" src={`http://localhost:4000/uploads/${booking?.place?.photos[1]}`} alt="" />
+              <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover w-full" src={`${booking?.place?.photos[1]}`} alt="" />
             )}
             <div className="overflow-hidden">
               {booking?.place?.photos?.[2] && (
-                <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover relative top-2 w-full" src={`http://localhost:4000/uploads/${booking?.place?.photos[2]}`} alt="" />
+                <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover relative top-2 w-full" src={`${booking?.place?.photos[2]}`} alt="" />
               )}
             </div>
           </div>

@@ -9,11 +9,12 @@ const PlacePage = () => {
     const { id } = useParams()
     const [place, setPlace] = useState(null)
     const [showAllPhotos, setShowAllPhotos] = useState(false)
-
+    console.log("antes del efecct",id)
     useEffect(() => {
         if (!id) {
+            console.log("if",id)
             return
-        }
+        }console.log("despues del return",id)
         axios.get(`http://localhost:4000/places/${id}`)
             .then(res => {
                 setPlace(res.data)
@@ -37,7 +38,7 @@ const PlacePage = () => {
                     </div>
                     {place?.photos?.length > 0 && place.photos.map((photo, index) => (
                         <div key={index}>
-                            <img src={`http://localhost:4000/uploads/${photo}`} alt="" />
+                            <img src={`${photo}`} alt="" />
                         </div>
                     ))}
                 </div>
@@ -60,17 +61,17 @@ const PlacePage = () => {
                     <div>
                         {place.photos?.[0] && (
                             <div>
-                                <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover w-full" src={`http://localhost:4000/uploads/${place.photos[0]}`} alt="" />
+                                <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover w-full" src={`${place.photos[0]}`} alt="" />
                             </div>
                         )}
                     </div>
                     <div className="grid">
                         {place.photos?.[1] && (
-                            <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover w-full" src={`http://localhost:4000/uploads/${place.photos[1]}`} alt="" />
+                            <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover w-full" src={`${place.photos[1]}`} alt="" />
                         )}
                         <div className="overflow-hidden">
                             {place.photos?.[2] && (
-                                <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover relative top-2 w-full" src={`http://localhost:4000/uploads/${place.photos[2]}`} alt="" />
+                                <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover relative top-2 w-full" src={`${place.photos[2]}`} alt="" />
                             )}
                         </div>
                     </div>

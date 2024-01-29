@@ -22,8 +22,8 @@ const authRouter = require("./auth-routes");
 const reviewController = require("./review-controller");
 const { registerAndEmail } = require("../server/email-controller");
 const cloudinary = require("./middleware/cloudinary-middleware");
-
 const nodemailer = require("nodemailer");
+const filtros = require("./filtros");
 
 app.use(
   session({
@@ -262,10 +262,10 @@ app.post("/places/:placeId/reviews", reviewController.createReview);
 app.get("/places/:placeId/reviews", reviewController.getReviewsByPlace);
 // Rutas para obtener lugares ordenados por valor de revisión asc y desc
 
-app.get(
-  "/places/sort-by-review-asc",
-  reviewController.getPlacesSortedByReviewAsc
-);
+//Rutas para filtros
+app.get("/places/by-avg-rating/:avgRating", filtros.getPlacesByAvgRating);
+app.get("/places/min-guests/:minGuests", filtros.getPlacesByGuests);
+app.get("/places/available/:checkIn/:checkOut", filtros.getAvailablePlaces);
 
 app.get(
   "/places/sort-by-review-desc",
