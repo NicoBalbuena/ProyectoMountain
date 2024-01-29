@@ -126,4 +126,6 @@ const getPlacesSortedByReviewDesc = async (req, res) => {
     }
 };
 
+
+
 module.exports = { createReview, getReviewsByPlace, getPlacesSortedByReviewAsc, getPlacesSortedByReviewDesc };
