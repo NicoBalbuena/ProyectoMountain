@@ -26,18 +26,9 @@ const createReview = async (req, res) => {
             // Asociar la revisión al lugar
             const place = await Place.findById(placeId);
             place.reviews.push(reviewDoc._id);
+            
+            // Guardar el lugar con la nueva revisión
             await place.save();
-
-            // Calcular el nuevo promedio de puntuaciones para el alojamiento
-            const reviews = await Review.find({ place: placeId });
-            const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-            const averageRating = totalRating / reviews.length;
-
-            // Redondear el promedio a un número entero
-            const roundedAverageRating = Math.round(averageRating);
-
-            // Actualizar el promedio de puntuaciones redondeado en el documento del alojamiento
-            await Place.findByIdAndUpdate(placeId, { $set: { rating: roundedAverageRating } });
 
             res.json(reviewDoc);
         });
@@ -46,7 +37,6 @@ const createReview = async (req, res) => {
     }
 };
 
-
 const getReviewsByPlace = async (req, res) => {
     const { placeId } = req.params;
 
@@ -54,10 +44,86 @@ const getReviewsByPlace = async (req, res) => {
         // Obtener las revisiones para un lugar específico, incluyendo la información del usuario
         const reviews = await Review.find({ place: placeId }).populate("user");
 
-        res.json(reviews);
+        // Calcular el avgRating
+        const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+        const avgRating = totalRating / reviews.length;
+
+        res.json({ reviews, avgRating });
     } catch (error) {
         res.status(500).json({ error: "Internal Server Error" });
     }
 };
 
-module.exports = { createReview, getReviewsByPlace };
+const getPlacesSortedByReviewAsc = async (req, res) => {
+    try {
+        const places = await Place.aggregate([
+            {
+                $lookup: {
+                    from: "reviews",
+                    localField: "reviews",
+                    foreignField: "_id",
+                    as: "reviewsData",
+                },
+            },
+            {
+                $addFields: {
+                    avgRating: {
+                        $cond: {
+                            if: { $gt: [{ $size: "$reviewsData" }, 0] },
+                            then: {
+                                $divide: [
+                                    { $sum: "$reviewsData.rating" },
+                                    { $size: "$reviewsData" },
+                                ],
+                            },
+                            else: 0,
+                        },
+                    },
+                },
+            },
+            { $sort: { avgRating: 1 } },
+        ]);
+
+        res.json(places);
+    } catch (error) {
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+const getPlacesSortedByReviewDesc = async (req, res) => {
+    try {
+        const places = await Place.aggregate([
+            {
+                $lookup: {
+                    from: "reviews",
+                    localField: "reviews",
+                    foreignField: "_id",
+                    as: "reviewsData",
+                },
+            },
+            {
+                $addFields: {
+                    avgRating: {
+                        $cond: {
+                            if: { $gt: [{ $size: "$reviewsData" }, 0] },
+                            then: {
+                                $divide: [
+                                    { $sum: "$reviewsData.rating" },
+                                    { $size: "$reviewsData" },
+                                ],
+                            },
+                            else: 0,
+                        },
+                    },
+                },
+            },
+            { $sort: { avgRating: -1 } },
+        ]);
+
+        res.json(places);
+    } catch (error) {
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+module.exports = { createReview, getReviewsByPlace, getPlacesSortedByReviewAsc, getPlacesSortedByReviewDesc };

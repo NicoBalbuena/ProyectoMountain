@@ -22,6 +22,7 @@ const authRouter = require("./auth-routes");
 const reviewController = require("./review-controller");
 const { registerAndEmail } = require("../server/email-controller");
 const cloudinary = require("./middleware/cloudinary-middleware");
+
 const nodemailer = require("nodemailer");
 
 app.use(
@@ -54,6 +55,7 @@ app.use(
 );
 
 // Manejo de errores de conexión a MongoDB
+
 mongoose.connection.on("error", (err) => {
   console.error("MongoDB connection error:", err);
 });
@@ -211,6 +213,7 @@ app.get("/places/sort-by-price-asc", async (req, res) => {
     res.json(places);
   } catch (error) {
     console.error("Error en la ruta de ordenar por precio ascendente:", error);
+
     res.status(500).json({
       error: error.message || "Internal Server Error",
       stack: error.stack,
@@ -227,6 +230,7 @@ app.get("/places/sort-by-price-desc", async (req, res) => {
     res.json(places);
   } catch (error) {
     console.error("Error en la ruta de ordenar por precio descendente:", error);
+
     res.status(500).json({
       error: error.message || "Internal Server Error",
       stack: error.stack,
@@ -257,35 +261,41 @@ app.get("/places/sort-by-guests-desc", async (req, res) => {
 app.post("/places/:placeId/reviews", reviewController.createReview);
 app.get("/places/:placeId/reviews", reviewController.getReviewsByPlace);
 // Rutas para obtener lugares ordenados por valor de revisión asc y desc
+
 app.get(
   "/places/sort-by-review-asc",
   reviewController.getPlacesSortedByReviewAsc
 );
+
 app.get(
   "/places/sort-by-review-desc",
   reviewController.getPlacesSortedByReviewDesc
 );
 
+//uploads
 const photosMiddleware = multer({ dest: "uploads/" });
 app.post(
   "/upload",
   photosMiddleware.array("photos", 100),
   cloudinary,
   (req, res) => {
-    const uploadedFiles = [];
-    for (let i = 0; i < req.files.length; i++) {
-      const { path, originalname } = req.files[i];
-      const parts = originalname.split(".");
-      const ext = parts[parts.length - 1];
-      const newPath = "uploads/" + Date.now() + "." + ext; // Nueva ruta sin la barra invertida
-      fs.copyFileSync(path, newPath);
-      fs.unlinkSync(path); // Elimina el archivo original
-      uploadedFiles.push(newPath.replace("uploads/", ""));
+    let uploadedFiles = [];
+    // Verificar si las fotos están en el cuerpo de la solicitud como URLs de Cloudinary
+    if (req.body.data && req.body.data.photos) {
+      uploadedFiles = req.body.data.photos;
+    } else if (req.body.photos) {
+      // Si las fotos están en el cuerpo de la solicitud como URLs de Cloudinary (modo file)
+      uploadedFiles = req.body.photos;
+    } else {
+      // Si las fotos no están en el cuerpo de la solicitud, asumir que están en los archivos cargados
+      uploadedFiles = req.files.map((file) => file.path);
     }
+    console.log(uploadedFiles);
     res.json(uploadedFiles);
   }
 );
 
+//places-post
 app.post("/places", cloudinary, (req, res) => {
   const { token } = req.cookies;
   const { data } = req.body;
@@ -301,6 +311,7 @@ app.post("/places", cloudinary, (req, res) => {
     guests,
     price,
   } = data;
+  console.log(photos);
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
     if (err) throw err;
     const placeDoc = await Place.create({

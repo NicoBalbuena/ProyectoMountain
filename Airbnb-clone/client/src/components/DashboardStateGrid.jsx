@@ -18,9 +18,6 @@ export const DashboardState = () => {
           </div>
         </div>
       </BoxWrapper>
-
-
-
       <BoxWrapper>
         <div className="w-12 h-12 rounded-full flex items-center justify-center bg-pink-500">
           <FaUserTie className="text-2x1 text-white" fontSize={24} />
@@ -35,10 +32,6 @@ export const DashboardState = () => {
           </div>
         </div>
       </BoxWrapper>
-
-
-
-
       <BoxWrapper>
         <div className="w-12 h-12 rounded-full flex items-center justify-center bg-pink-500">
           <IoHomeSharp className="text-2x1 text-white" fontSize={24} />

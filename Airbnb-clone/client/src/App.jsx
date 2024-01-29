@@ -30,7 +30,7 @@ function App() {
           <Route path="/account/bookings" element={<BookingsPage />} />
           <Route path="/account/bookings/:id" element={<BookingPage />} />
         </Route>
-        /*Dashboard */
+      
           <Route path="/dashboard" element={<Dashboard/>}>
           <Route path="/dashboard/users" element={<Dashboard/>}/>
           <Route path="/dashboard/lodgins" element={<Dashboard/>}/>
