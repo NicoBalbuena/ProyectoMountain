@@ -7,23 +7,22 @@ async function cloudinaryMiddleware(req, res, next) {
     // Verificar si las fotos están en el cuerpo como JSON
     if (req.body.data && req.body.data.photos) {
       photos = req.body.data.photos;
-    }
-
-    // Si no se encontraron fotos en formato JSON, verificar si están en formato form
-    if (!photos && req.files && req.files.length > 0) {
-      // Obtener las URLs de las fotos desde los archivos subidos
+    } else if (req.files && req.files.length > 0) {
+      // Verificar si las fotos están en formato form
       photos = req.files.map((file) => file.path);
     }
 
     // Si no hay fotos, devolver un error
     if (!photos || photos.length === 0) {
-      return res.status(404).json({ Message: "Image not found" });
+      return res
+        .status(400)
+        .json({ error: "No se encontraron imágenes para cargar" });
     }
 
     // Subir las fotos a Cloudinary
     const uploadPromises = photos.map(async (photo) => {
       const result = await cloudinary.uploader.upload(photo, {
-        upload_preset: "ml_default",
+        upload_preset: "lodgings",
         allowed_formats: [
           "png",
           "jpg",
@@ -34,11 +33,14 @@ async function cloudinaryMiddleware(req, res, next) {
           "png",
           "webp",
         ],
-      });
 
+        folder: "lodgings",
+      });
+      console.log("Cloudinary upload result:", result);
       return result.secure_url;
     });
 
+    // Esperar a que se completen todas las cargas de imágenes
     const uploadedImages = await Promise.all(uploadPromises);
 
     // Actualizar las fotos en el cuerpo de la solicitud
@@ -47,11 +49,11 @@ async function cloudinaryMiddleware(req, res, next) {
     } else {
       req.body.photos = uploadedImages;
     }
-
+    // Llamar al siguiente middleware
     next();
   } catch (error) {
-    console.error(error);
-    throw new Error({ Error: error });
+    console.error("Error al cargar imágenes a Cloudinary:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 }
 

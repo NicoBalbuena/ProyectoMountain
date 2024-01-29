@@ -31,7 +31,7 @@ const BookingPage = () => {
 
   if (showAllPhotos) {
     return (
-      <div className="absolute inset-0 bg-black text-white min-h-screen">
+      <div className="absolute inset-0 z-50 text-white min-h-screen">
         <div className="bg-black p-8 grid gap-4">
           <div>
             <h2 className="text-3xl mr-48">Photos of {booking?.place?.title}</h2>
@@ -45,7 +45,7 @@ const BookingPage = () => {
           <div className="flex flex-col items-center gap-4">
             {booking?.place?.photos?.length > 0 && booking?.place?.photos.map((photo, index) => (
               <div className="" key={index}>
-                <img className="w-[800px]" src={`http://localhost:4000/uploads/${photo}`} alt="" />
+                <img className="w-[800px]" src={`${photo}`} alt="" />
               </div>
             ))}
           </div>
@@ -55,7 +55,8 @@ const BookingPage = () => {
   }
 
   return (
-    <div className="mt-4 bg-gray-100 -mx-8 px-8 pt-8">
+    <div className="mt-4 px-8 mx-5 mb-[150px]">
+      <hr />
       <h1 className="text-3xl">{booking?.place?.title}</h1>
       <a className="flex gap-1 my-3 font-semibold underline" rel="noopener noreferrer" target="_blank" href={`https://maps.google.com/?q=${booking?.place?.address}`}>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -69,17 +70,17 @@ const BookingPage = () => {
           <div>
             {booking?.place?.photos?.[0] && (
               <div>
-                <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover w-full" src={`http://localhost:4000/uploads/${booking?.place?.photos[0]}`} alt="" />
+                <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover w-full" src={`${booking?.place?.photos[0]}`} alt="" />
               </div>
             )}
           </div>
           <div className="grid">
             {booking?.place?.photos?.[1] && (
-              <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover w-full" src={`http://localhost:4000/uploads/${booking?.place?.photos[1]}`} alt="" />
+              <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover w-full" src={`${booking?.place?.photos[1]}`} alt="" />
             )}
             <div className="overflow-hidden">
               {booking?.place?.photos?.[2] && (
-                <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover relative top-2 w-full" src={`http://localhost:4000/uploads/${booking?.place?.photos[2]}`} alt="" />
+                <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer hover:opacity-90 aspect-square object-cover relative top-2 w-full" src={`${booking?.place?.photos[2]}`} alt="" />
               )}
             </div>
           </div>

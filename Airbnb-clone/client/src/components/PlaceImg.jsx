@@ -5,7 +5,7 @@ const PlaceImg = ({ place }) => {
     }
 
     return (
-        <img className="object-cover" src={"http://localhost:4000/uploads/" + place.photos[0]} alt="" />
+        <img className="object-cover" src={place.photos[0]} alt="" />
 
     )
 }
