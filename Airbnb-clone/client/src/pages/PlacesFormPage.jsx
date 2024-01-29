@@ -161,9 +161,9 @@ const PlacesFormPage = () => {
 
 
   return (
-    <div>
+    <div className="mb-[150px]">
       <AccountNav />
-      <form onSubmit={savePlace}>
+      <form onSubmit={savePlace} className="mx-52">
         <h2 className="text-2xl mt-4">Title</h2>
         <input
           type="text"

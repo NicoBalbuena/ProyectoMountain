@@ -38,7 +38,7 @@ const IndexPage = () => {
     fetchPlaces(); // Volvemos a obtener los lugares sin ningún ordenamiento
     setSortedPlaces([]); // Restablecemos los lugares ordenados a un arreglo vacío
   };
-  
+
 
   const pageCount = Math.ceil(places.length / placesPerPage);
 
@@ -82,66 +82,69 @@ const IndexPage = () => {
   };
 
   return (
-    <div>
+    <div className="mb-[150px]">
       <div>
         <Banner />
       </div>
-      <div>
-        <h1>Filtros</h1>
-        <button onClick={() => filterByAvgRating(5)}>Filter by rating promedio (5 estrellas)</button>
-        <button onClick={() => filterByMinGuests(4)}>Filter by cantidad mínima de huéspedes (4 o más)</button>
-        <button onClick={() => filterByAvailability("2024-02-01", "2024-02-07")}>Filtrar por disponibilidad </button>
-      </div>
-      <div>
-        <select onChange={(e) => {
-          const value = e.target.value;
-          if (value === "clear") {
-            handleClearSort();
-          } else {
-            handleSort(value);
-          }
-        }}>
-          <option value="default">Ordenar por</option>
-          <option value="price-desc">Precio (Desc)</option>
-          <option value="price-asc">Precio (Asc)</option>
-          <option value="guests-asc">Huéspedes (Asc)</option>
-          <option value="guests-desc">Huéspedes (Desc)</option>
-          <option value="review-asc">Review (Asc)</option>
-          <option value="review-desc">Review (Desc)</option>
-        </select>
-        
-      </div>
-      <button onClick={handleClearSort}>Clear</button>
-      <div className="mt-8 grid gap-x-6 gap-y-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {(sortedPlaces.length > 0 ? sortedPlaces : places)
-          .slice(pagesVisited, pagesVisited + placesPerPage)
-          .map((place) => (
-            <Link to={`/place/${place._id}`} key={place._id}>
-              <div className="bg-gray-500 rounded-2xl flex mb-2">
-                {place.photos?.[0] && (
-                  <img className="rounded-2xl object-cover aspect-square" src={place.photos?.[0]} alt="" />
-                )}
-              </div>
-              <h2 className="font-bold">{place.address}</h2>
-              <h3 className="text-sm truncate text-gray-500">{place.title}</h3>
-              <div className="mt-1">
-                <span className="font-bold">${place.price}</span> per night
-              </div>
-            </Link>
-          ))}
-      </div>
-      <div className="pagination">
-        <ReactPaginate
-          previousLabel={"Previous"}
-          nextLabel={"Next"}
-          pageCount={pageCount}
-          onPageChange={changePage}
-          containerClassName={"pagination"}
-          previousLinkClassName={"pagination__link"}
-          nextLinkClassName={"pagination__link"}
-          disabledClassName={"pagination__link--disabled"}
-          activeClassName={"pagination__link--active"}
-        />
+      <div className="mx-6">
+        <div className="mt-5">
+          <h1>Filtros</h1>
+          <button onClick={() => filterByAvgRating(5)}>Filter by rating promedio (5 estrellas)</button>
+          <button onClick={() => filterByMinGuests(4)}>Filter by cantidad mínima de huéspedes (4 o más)</button>
+          <button onClick={() => filterByAvailability("2024-02-01", "2024-02-07")}>Filtrar por disponibilidad </button>
+        </div>
+        <div>
+          <select onChange={(e) => {
+            const value = e.target.value;
+            if (value === "clear") {
+              handleClearSort();
+            } else {
+              handleSort(value);
+            }
+          }}>
+            <option value="default">Ordenar por</option>
+            <option value="price-desc">Precio (Desc)</option>
+            <option value="price-asc">Precio (Asc)</option>
+            <option value="guests-asc">Huéspedes (Asc)</option>
+            <option value="guests-desc">Huéspedes (Desc)</option>
+            <option value="review-asc">Review (Asc)</option>
+            <option value="review-desc">Review (Desc)</option>
+          </select>
+
+        </div>
+        <button onClick={handleClearSort}>Clear</button>
+        <div className="mt-8 grid gap-x-6 gap-y-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {(sortedPlaces.length > 0 ? sortedPlaces : places)
+            .slice(pagesVisited, pagesVisited + placesPerPage)
+            .map((place) => (
+              <Link to={`/place/${place._id}`} key={place._id}>
+                <div className="bg-gray-500 rounded-2xl flex mb-2">
+                  {place.photos?.[0] && (
+                    <img className="rounded-2xl object-cover aspect-square" src={"http://localhost:4000/uploads/" + place.photos?.[0]} alt="" />
+                  )}
+                </div>
+                <h2 className="font-bold">{place.address}</h2>
+                <h3 className="text-sm truncate text-gray-500">{place.title}</h3>
+                <div className="mt-1">
+                  <span className="font-bold">${place.price}</span> per night
+                </div>
+              </Link>
+            ))}
+        </div>
+        <div className=" mt-7">
+          <ReactPaginate
+            className="flex justify-center gap-3"
+            previousLabel={"Previous"}
+            nextLabel={"Next"}
+            pageCount={pageCount}
+            onPageChange={changePage}
+            containerClassName={"pagination"}
+            previousLinkClassName={"pagination__link"}
+            nextLinkClassName={"pagination__link"}
+            disabledClassName={"pagination__link--disabled"}
+            activeClassName={"pagination__link--active"}
+          />
+        </div>
       </div>
     </div>
   );

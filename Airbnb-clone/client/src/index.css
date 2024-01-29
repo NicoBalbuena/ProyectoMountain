@@ -22,20 +22,5 @@ button {
 
 button.primary {
     background-color: #F5385D;
-    @apply bg-primary p-2 w-full text-white rounded-2xl;
-}
-
-@layer base{
-    th,td{
-        @apply py-3 px-2.5 text-sm text-left border-y border-green-200
-    }
-    thead{
-        @apply bg-neutral-100
-    }
-    th{
-        @apply font-semibold
-    }
-    a{
-        @apply text-sky-500 hover:underline
-    }
+    @apply bg-primary p-2 w-full text-black rounded-2xl hover:bg-yellow-400;
 }
