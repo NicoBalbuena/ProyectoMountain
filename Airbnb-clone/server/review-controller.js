@@ -41,12 +41,12 @@ const getReviewsByPlace = async (req, res) => {
     const { placeId } = req.params;
 
     try {
-        // Obtener las revisiones para un lugar específico, incluyendo la información del usuario
+        // Obtener todas las revisiones para una cabaña específica, incluyendo la información del usuario
         const reviews = await Review.find({ place: placeId }).populate("user");
 
-        // Calcular el avgRating
+        // Calcular el avgRating para todas las revisiones de esta cabaña
         const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-        const avgRating = totalRating / reviews.length;
+        const avgRating = reviews.length > 0 ? totalRating / reviews.length : 0;
 
         res.json({ reviews, avgRating });
     } catch (error) {
