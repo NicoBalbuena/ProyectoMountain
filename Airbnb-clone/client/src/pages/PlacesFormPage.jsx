@@ -57,7 +57,7 @@ const PlacesFormPage = () => {
     e.preventDefault();
     try {
       const { data: filename } = await axios.post(
-        "http://localhost:4000/uploads-by-link",
+        "/uploads-by-link",
         { link: input.photosLink },
         { withCredentials: true }
       );
@@ -113,6 +113,7 @@ const PlacesFormPage = () => {
   };
 
   const savePlace = async (e) => {
+    console.log(e)
     e.preventDefault();
     try {
       if (id) {
@@ -159,7 +160,7 @@ const PlacesFormPage = () => {
   }
 
 
-
+  console.log(input)
   return (
     <div className="mb-[150px]">
       <AccountNav />
