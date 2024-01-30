@@ -9,15 +9,17 @@ const createReview = async (req, res) => {
     const { data } = req.body;
     const { placeId } = req.params;
     const { rating, reviewText } = data;
-
+    console.log(data)
+    console.log(token)
     try {
+        
         // Verificar el token y obtener el ID del usuario
         jwt.verify(token, jwtSecret, {}, async (err, userData) => {
             if (err) throw err;
 
             // Crear la revisión
             const reviewDoc = await Review.create({
-                user: userData.id,
+                user: userData._id,
                 place: placeId,
                 rating,
                 reviewText,
@@ -41,12 +43,12 @@ const getReviewsByPlace = async (req, res) => {
     const { placeId } = req.params;
 
     try {
-        // Obtener las revisiones para un lugar específico, incluyendo la información del usuario
+        // Obtener todas las revisiones para una cabaña específica, incluyendo la información del usuario
         const reviews = await Review.find({ place: placeId }).populate("user");
 
-        // Calcular el avgRating
+        // Calcular el avgRating para todas las revisiones de esta cabaña
         const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-        const avgRating = totalRating / reviews.length;
+        const avgRating = reviews.length > 0 ? totalRating / reviews.length : 0;
 
         res.json({ reviews, avgRating });
     } catch (error) {
