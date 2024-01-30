@@ -33,7 +33,8 @@ const BookingsPage = () => {
                     review,
                     rating,
                 }
-            });
+            },{ withCredentials: true });
+
         
             // Verificar si la solicitud fue exitosa
             if (response.status === 200) {
