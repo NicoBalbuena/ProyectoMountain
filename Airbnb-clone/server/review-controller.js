@@ -9,15 +9,17 @@ const createReview = async (req, res) => {
     const { data } = req.body;
     const { placeId } = req.params;
     const { rating, reviewText } = data;
-
+    console.log(data)
+    console.log(token)
     try {
+        
         // Verificar el token y obtener el ID del usuario
         jwt.verify(token, jwtSecret, {}, async (err, userData) => {
             if (err) throw err;
 
             // Crear la revisión
             const reviewDoc = await Review.create({
-                user: userData.id,
+                user: userData._id,
                 place: placeId,
                 rating,
                 reviewText,
