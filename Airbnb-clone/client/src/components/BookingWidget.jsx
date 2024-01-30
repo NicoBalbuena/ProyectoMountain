@@ -23,8 +23,11 @@ const BookingWidget = ({ place }) => {
     })
 
     useEffect(() => {
-        setName(user.name)
-    }, [user])
+        if (user && user.name) {
+            setName(user.name);
+        }
+    }, [user]);
+    
 
     let numberOfNights = 0
 
