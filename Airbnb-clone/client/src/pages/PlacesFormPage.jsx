@@ -126,6 +126,7 @@ const PlacesFormPage = () => {
   };
 
   const savePlace = async (e) => {
+    console.log(e)
     e.preventDefault();
     try {
       if (id) {

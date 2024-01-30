@@ -7,6 +7,9 @@ import { useContext } from "react";
 import { UserContext } from "./UserContext";
 
 const BookingWidget = ({ place }) => {
+    // Almacenar el placeId en localStorage
+    localStorage.setItem('placeId', place._id);
+    console.log("se almacena ok",place._id)
 
     const [checkIn, setCheckIn] = useState("")
     const [checkOut, setCheckOut] = useState("")
@@ -23,8 +26,11 @@ const BookingWidget = ({ place }) => {
     })
 
     useEffect(() => {
-        setName(user.name)
-    }, [user])
+        if (user && user.name) {
+            setName(user.name);
+        }
+    }, [user]);
+    
 
     let numberOfNights = 0
 
