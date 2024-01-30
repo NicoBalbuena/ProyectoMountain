@@ -1,0 +1,48 @@
+.banner {
+    display: flex;
+    background: url("../../assets/cabaña.jpg") center center;
+    background-repeat: no-repeat;
+    background-size: 100% 120%; 
+    height: 55vh;
+    position: relative;
+    object-fit: cover;
+}
+
+.banner_info {
+    background-color: rgba(255, 255, 255, 0.274);
+    backdrop-filter: blur(5px);
+    color: #fff;
+    padding: 10vh 30px 30px 40px;
+    width: 300px;
+    
+}
+
+.banner_info button {
+    background-color: #df595c;
+    color: #fff;
+    text-transform: inherit;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 20px;
+    font-weight: 600;
+}
+
+.banner_info button:hover {
+    background-color: #fff;
+    color: #ff7779;
+}
+
+.banner_info h5 {
+    margin-top: 10px;
+}
+
+.banner_info h5 {
+    margin-top: 10px;
+    font-size: 13px; 
+}
+
+.banner_info h1 {
+    margin-top: 10px;
+    font-size: 20px; 
+}

@@ -12,7 +12,22 @@ const placeSchema = new mongoose.Schema({
     checkOut: Number,
     guests: Number,
     price: Number,
-})
+    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
+    avgRating: Number,
+});
+
+// Middleware init para ejecutar código cada vez que se inicializa un documento Place
+placeSchema.post("init", async function(doc) {
+    try {
+        // Obtener las revisiones asociadas al lugar
+        const reviewsData = await mongoose.model("Review").find({ _id: { $in: doc.reviews } });
+
+        // Calcular el avgRating
+        doc.avgRating = reviewsData.length > 0 ? reviewsData.reduce((sum, review) => sum + review.rating, 0) / reviewsData.length : 0;
+    } catch (error) {
+        console.error("Error al calcular avgRating:", error);
+    }
+});
 
 const PlaceModel = mongoose.model("Place", placeSchema);
 

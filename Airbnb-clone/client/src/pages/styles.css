@@ -1,0 +1,28 @@
+.pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    justify-content: center;
+  }
+  
+  .pagination__item {
+    margin: 0 5px;
+  }
+  
+  .pagination__link {
+    text-decoration: none;
+    color: #333;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .pagination__link:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .pagination__link--disabled {
+    pointer-events: none;
+    color: #999;
+  }
+  
