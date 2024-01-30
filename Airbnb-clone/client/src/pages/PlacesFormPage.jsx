@@ -57,7 +57,7 @@ const PlacesFormPage = () => {
     e.preventDefault();
     try {
       const { data: filename } = await axios.post(
-        "http://localhost:4000/uploads-by-link",
+        "/uploads-by-link",
         { link: input.photosLink },
         { withCredentials: true }
       );

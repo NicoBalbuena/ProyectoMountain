@@ -39,7 +39,7 @@ const PlacePage = () => {
                     <div className="flex flex-col items-center gap-4">
                         {place?.photos?.length > 0 && place.photos.map((photo, index) => (
                             <div key={index}>
-                                <img className="w-[800px]" src={`http://localhost:4000/uploads/${photo}`} alt="" />
+                                <img className="w-[800px]" src={`${photo}`} alt="" />
                             </div>
                         ))}
                     </div>
