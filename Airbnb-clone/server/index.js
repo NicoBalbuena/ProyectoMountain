@@ -21,6 +21,7 @@ const jwtSecret = "ksdojodksokdmc3";
 const authRouter = require("./auth-routes");
 const reviewController = require("./review-controller");
 const { registerAndEmail } = require("../server/email-controller");
+const { deletePlace, deleteUser, deleteBooking, deleteReview } = require("./deleteController.js");
 const cloudinary = require("./middleware/cloudinary-middleware");
 const nodemailer = require("nodemailer");
 const filtros = require("./filtros");
@@ -53,6 +54,13 @@ app.use(
     optionsSuccessStatus: 204,
   })
 );
+
+// Borrado lógico
+
+app.delete("/places/:id", deletePlace);
+app.delete("/bookings/:id", deleteBooking);
+app.delete("/places/:placeId/reviews", deleteReview);
+app.delete("/users/:id", deleteUser);
 
 // Manejo de errores de conexión a MongoDB
 
@@ -405,7 +413,13 @@ app.put("/places", async (req, res) => {
 });
 
 app.get("/places", async (req, res) => {
-  res.json(await Place.find());
+  try {
+      const places = await Place.find({deleted: false});
+      res.json(places);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 app.post("/bookings", async (req, res) => {
@@ -448,6 +462,30 @@ app.post("/bookings", async (req, res) => {
     res.status(404).json("error");
   }
 });
+
+app.get("/users", async (req, res) => {
+  try {
+    const users = await UserModel.find({deleted: false});
+    return res.status(200).json(users);
+  } catch (error) {
+    console.error("Error getting users", error)
+    return res.status(500).json({message: "Error getting users"})
+  }
+})
+
+app.get("/users/:id", async (req,res) => {
+  try {
+    const { id } = req.params;
+    const user = await UserModel.findById(id);
+    if(!user) return res.status(404).json({message: "User not found"});
+
+    return res.status(200).json(user);
+  } catch (error) {
+    console.error("Error gettting user by id", error);
+    res.status(500).json({message: "Internal Server Error"});
+  }
+})
+
 
 app.get("/bookings", async (req, res) => {
   const { token } = req.cookies;
