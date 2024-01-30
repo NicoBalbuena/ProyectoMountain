@@ -4,7 +4,6 @@ import Perks from "../components/Perks";
 import axios from "axios";
 import AccountNav from "../components/AccountNav";
 
-const preset = "ml_default";
 const PlacesFormPage = () => {
   const [redirect, setRedirect] = useState(false);
   const { id } = useParams();
@@ -17,6 +16,7 @@ const PlacesFormPage = () => {
     description: "",
     perks: [],
     extraInfo: "",
+    type: "",
     checkIn: "",
     checkOut: "",
     guests: 1,
@@ -38,13 +38,27 @@ const PlacesFormPage = () => {
         description: data.description,
         perks: data.perks,
         extraInfo: data.extraInfo,
-        checkIn: data.checkIn,
-        checkOut: data.checkOut,
+        type: data.type,
         guests: data.guests,
         price: data.price,
       });
     });
   }, [id]);
+
+  const handleType = (e) => {
+    const { name } = e.target
+    if (input.type === name) {
+      setInput((prevInput) => ({
+        ...prevInput,
+        type: "",
+      }));
+    } else {
+      setInput((prevInput) => ({
+        ...prevInput,
+        type: name,
+      }));
+    }
+  }
 
   const handleChange = (e) => {
     setInput({
@@ -76,33 +90,32 @@ const PlacesFormPage = () => {
 
   const uploadPhoto = (e) => {
     const files = e.target.files;
-  const data = new FormData();
-  for (let i = 0; i < files.length; i++) {
-    data.append("photos", files[i]);
-    console.log(files[i])
-  }
-  axios
-    .post(
-      "http://localhost:4000/upload", // Corregir la URL aquí
-      data,
-      { headers: { "Content-Type": "multipart/form-data" } }
-      
-    )
-    .then((res) => {
-      const { data: filenames } = res;
-      setInput((prev) => {
-        console.log(prev)
-        return {
-          ...prev,
-          photos: [...prev.photos, ...filenames],
-        };
-       
+    const data = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      data.append("photos", files[i]);
+      console.log(files[i])
+    }
+    axios
+      .post(
+        "http://localhost:4000/upload", // Corregir la URL aquí
+        data,
+        { headers: { "Content-Type": "multipart/form-data" } }
+
+      )
+      .then((res) => {
+        const { data: filenames } = res;
+        setInput((prev) => {
+          console.log(prev)
+          return {
+            ...prev,
+            photos: [...prev.photos, ...filenames],
+          };
+
+        });
+      })
+      .catch((error) => {
+        console.error("Error uploading photo: ", error);
       });
-      console.log(filenames)
-    })
-    .catch((error) => {
-      console.error("Error uploading photo: ", error);
-    });
   };
 
   const handlePerksChange = (updatedPerks) => {
@@ -136,7 +149,7 @@ const PlacesFormPage = () => {
       // como mostrar un mensaje de error al usuario, volver a cargar la página, etc.
     }
   };
-  
+
   const removePhoto = (filename) => {
     setInput((prevInput) => ({
       ...prevInput,
@@ -155,12 +168,15 @@ const PlacesFormPage = () => {
     }));
   };
 
+
+  console.log(input.type);
+
   if (redirect) {
     return <Navigate to={"/account/places"} />;
   }
 
+  console.log(input, "estado");
 
-  console.log(input)
   return (
     <div className="mb-[150px]">
       <AccountNav />
@@ -207,7 +223,6 @@ const PlacesFormPage = () => {
                   src={link}
                   alt=""
                 />
-                  {console.log("Link:", link)}
                 <button
                   type="button"
                   onClick={() => removePhoto(link)}
@@ -310,32 +325,35 @@ const PlacesFormPage = () => {
           value={input.extraInfo}
           onChange={handleChange}
         />
-        <h2 className="text-2xl mt-4">Check in&out times</h2>
+        <h2 className="text-2xl mt-4">Types</h2>
         <p className="text-gray-500 text-sm">
-          add check in and out times, remember to have some time window for
-          cleaning the room between guests
+          Which of these options best describes your accommodation?
         </p>
-        <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
-          <div>
-            <h3 className="mt-2 -mb-1 text-center">Check in time</h3>
-            <input
-              type="text"
-              placeholder="14:00"
-              name="checkIn"
-              value={input.checkIn}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <h3 className="mt-2 -mb-1 text-center">Check out time</h3>
-            <input
-              type="text"
-              placeholder="11:00"
-              name="checkOut"
-              value={input.checkOut}
-              onChange={handleChange}
-            />
-          </div>
+        <div className="grid grid-cols-3 gap-2">
+          <button type="button" className={`w-full border my-1 py-2 px-3 rounded-2xl transition flex items-center justify-center gap-2 ${input.type === "house" ? "bg-primary" : "bg-transparent"} `} name="house" onClick={handleType}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+            </svg>
+            House
+          </button>
+          <button type="button" className={`w-full border my-1 py-2 px-3 rounded-2xl transition flex items-center justify-center gap-2 ${input.type === "apartment" ? "bg-primary" : "bg-transparent"} `} name="apartment" onClick={handleType}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+            </svg>
+            Apartment
+          </button>
+          <button type="button" className={`w-full border my-1 py-2 px-3 rounded-2xl transition flex items-center justify-center gap-2 ${input.type === "cabin" ? "bg-primary" : "bg-transparent"} `} name="cabin" onClick={handleType}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205 3 1m1.5.5-1.5-.5M6.75 7.364V3h-3v18m3-13.636 10.5-3.819" />
+            </svg>
+            cabin
+          </button>
+        </div>
+        <h2 className="text-2xl mt-4">Guests & price</h2>
+        <p className="text-gray-500 text-sm">
+          How many people can stay here? & What will be the price per night?
+        </p>
+        <div className="grid gap-2 grid-cols-2 md:grid-cols-2">
           <div>
             <h3 className="mt-2 -mb-1 text-center">Max number of guests</h3>
             <input

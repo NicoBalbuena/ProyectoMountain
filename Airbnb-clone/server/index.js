@@ -308,8 +308,7 @@ app.post("/places", cloudinary, (req, res) => {
     description,
     perks,
     extraInfo,
-    checkIn,
-    checkOut,
+    type,
     guests,
     price,
   } = data;
@@ -324,8 +323,7 @@ app.post("/places", cloudinary, (req, res) => {
       description,
       perks,
       extraInfo,
-      checkIn,
-      checkOut,
+      type,
       guests,
       price,
     });
@@ -378,8 +376,7 @@ app.put("/places", async (req, res) => {
     description,
     perks,
     extraInfo,
-    checkIn,
-    checkOut,
+    type,
     guests,
     price,
   } = data;
@@ -395,8 +392,7 @@ app.put("/places", async (req, res) => {
         description,
         perks,
         extraInfo,
-        checkIn,
-        checkOut,
+        type,
         guests,
         price,
       });
