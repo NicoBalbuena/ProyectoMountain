@@ -25,6 +25,7 @@ const cloudinary = require("./middleware/cloudinary-middleware");
 const nodemailer = require("nodemailer");
 const filtros = require("./filtros");
 
+
 app.use(
   session({
     secret: process.env.JWT_SECRET,
