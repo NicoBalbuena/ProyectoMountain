@@ -274,13 +274,9 @@ app.get("/places/:placeId/reviews", reviewController.getReviewsByPlace);
 //Rutas para filtros
 app.get("/places/by-avg-rating/:avgRating", filtros.getPlacesByAvgRating);
 app.get("/places/min-guests/:minGuests", filtros.getPlacesByGuests);
-app.get("/places/available/:checkIn/:checkOut", filtros.getAvailablePlaces);
 app.get("/places/filter", filtros.getFilteredPlaces)
 
-app.get(
-  "/places/sort-by-review-desc",
-  reviewController.getPlacesSortedByReviewDesc
-);
+app.get("/places/sort-by-review-desc",reviewController.getPlacesSortedByReviewDesc);
 
 //uploads
 const photosMiddleware = multer({ dest: "uploads/" });

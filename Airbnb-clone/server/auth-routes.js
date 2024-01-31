@@ -1,6 +1,8 @@
 const { Router } = require("express");
 const passport = require("passport");
 const User = require("./models/user");
+const jwt = require("jsonwebtoken");
+const jwtSecret = "ksdojodksokdmc3";
 
 const authRouter = Router();
 
@@ -18,18 +20,19 @@ authRouter.get('/login/google/callback', passport.authenticate('google', { failu
 
 // Ruta de registro con Google
 authRouter.post('/register/google', async (req, res) => {
-    const { nameGoogle, emailGoogle } = req.body;
-
+    const { nameGoogle, emailGoogle, accessToken } = req.body;
+    console.log('Body: ', req.body);
     try {
         // Verificar si el usuario ya existe en la base de datos
         let user = await User.findOne({ email: emailGoogle });
-
+        console.log('User')
         if (!user) {
             // Si el usuario no existe, y el emailGoogle no es null, crear uno nuevo
             if (emailGoogle) {
                 user = await User.create({
                     name: nameGoogle,
                     email: emailGoogle,
+                    token: accessToken, // Guardar el accessToken en la base de datos
                 });
             } else {
                 return res.status(422).json({ error: 'El campo emailGoogle no puede ser nulo' });
@@ -46,13 +49,17 @@ authRouter.post('/register/google', async (req, res) => {
                 console.error('Error al iniciar sesión:', err);
                 return res.status(500).json({ error: 'Error interno del servidor' });
             }
-
-            // Devolver la información del usuario autenticado
-            return res.status(200).json({
-                id: user._id,
-                name: user.name,
-                email: user.email,
-            });
+            
+            jwt.sign(
+                { email: user.email, id: user._id },
+                jwtSecret,
+                {},
+                (err, token) => {
+                    if (err) throw err;
+                    res.cookie("token", token);
+                    res.json(user);
+                }
+            );
         });
     } catch (error) {
         console.error('Error durante el registro con Google:', error);

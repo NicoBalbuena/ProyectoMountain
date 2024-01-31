@@ -52,38 +52,6 @@ const getPlacesByAvgRating = async (req, res) => {
     }
 };
 
-const getAvailablePlaces = async (req, res) => {
-    const { checkIn, checkOut } = req.params;
-
-    try {
-        const places = await Place.find({
-            $or: [
-                {
-                    $and: [
-                        { checkIn: { $lte: new Date(checkIn) } },
-                        { checkOut: { $gte: new Date(checkIn) } }
-                    ]
-                },
-                {
-                    $and: [
-                        { checkIn: { $lte: new Date(checkOut) } },
-                        { checkOut: { $gte: new Date(checkOut) } }
-                    ]
-                },
-                {
-                    $and: [
-                        { checkIn: { $gte: new Date(checkIn) } },
-                        { checkOut: { $lte: new Date(checkOut) } }
-                    ]
-                }
-            ]
-        });
-
-        res.json(places);
-    } catch (error) {
-        res.status(500).json({ error: "Internal Server Error" });
-    }
-};
 
 const getFilteredPlaces = async (req, res) => {
     try {
@@ -133,4 +101,4 @@ const getFilteredPlaces = async (req, res) => {
 
 
 
-module.exports = {getPlacesByGuests, getPlacesByAvgRating, getAvailablePlaces, getFilteredPlaces}
+module.exports = {getPlacesByGuests, getPlacesByAvgRating, getFilteredPlaces}

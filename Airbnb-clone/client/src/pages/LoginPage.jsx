@@ -47,12 +47,15 @@ const LoginPage = () => {
 
     const onSuccess = async (response) => {
         setUserGoogle(response.profileObj);
+        const googleAccessToken = response.tokenId || response.accessToken;
+        console.log(googleAccessToken);
         try {
             const { data } = await axios.post(
                 "http://localhost:4000/auth/register/google",
                 {
                     emailGoogle: response.profileObj.email,
                     nameGoogle: response.profileObj.name,
+                    accessToken: googleAccessToken,
                 },
                 { withCredentials: true }
             );
