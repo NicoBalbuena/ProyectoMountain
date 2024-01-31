@@ -83,7 +83,7 @@ const IndexPage = () => {
   };
 
   return (
-    <div className="mb-[150px]">
+    <div className="mb-[20px]">
       <div>
         <Banner />
       </div>
@@ -134,13 +134,14 @@ const IndexPage = () => {
                     <img className="rounded-2xl object-cover aspect-square w-full" src={place.photos?.[0]} alt="" />
                   )}
                 </div>
-                <div className="flex justify-between">
-                  <div>
+                <div className="flex flex-col">
+                  <div className="flex flex-col">
                     <h2 className="font-bold">{place.address}</h2>
                     <h3 className="text-sm truncate text-gray-500">{place.title}</h3>
                   </div>
-                  <div className="mt-1">
-                    <span className="font-bold">${place.price}</span> per night
+                  <div className="mt-1 flex gap-1">
+                    <span className="font-bold">${place.price} </span> 
+                    <p>per night</p>
                   </div>
                 </div>
               </Link>

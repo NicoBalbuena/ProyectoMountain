@@ -80,7 +80,7 @@ const BookingsPage = () => {
             <AccountNav />
             <div className="mx-5">
                 {bookings?.length > 0 && bookings.map((booking, index) => (
-                    <div key={booking._id} className="flex gap-4 shadow shadow-black rounded-2xl overflow-hidden mt-3">
+                    <Link to={`/account/bookings/${booking._id}`}  key={booking._id} className="flex gap-4 shadow shadow-black rounded-2xl overflow-hidden mt-3">
                         <div className="w-48">
                             <PlaceImg place={booking.place} />
                         </div>
@@ -158,7 +158,7 @@ const BookingsPage = () => {
                                 </div>
                             </form>
                         </div>
-                    </div>
+                    </Link>
                 ))}
             </div>
             {submitError && <p className="mt-2 text-sm text-red-600">{submitError}</p>}
