@@ -5,7 +5,7 @@ export const DashboardState = () => {
   return (
     <div className="flex gap-4 w-full">
       <BoxWrapper>
-        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-pink-500">
+        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-yellow-400">
           <FaUsers className="text-2x1 text-white" fontSize={24} />
         </div>
         <div className="pl-4">
@@ -19,7 +19,7 @@ export const DashboardState = () => {
         </div>
       </BoxWrapper>
       <BoxWrapper>
-        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-pink-500">
+        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-yellow-400">
           <FaUserTie className="text-2x1 text-white" fontSize={24} />
         </div>
         <div className="pl-4">
@@ -33,7 +33,7 @@ export const DashboardState = () => {
         </div>
       </BoxWrapper>
       <BoxWrapper>
-        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-pink-500">
+        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-yellow-400">
           <IoHomeSharp className="text-2x1 text-white" fontSize={24} />
         </div>
         <div className="pl-4">
