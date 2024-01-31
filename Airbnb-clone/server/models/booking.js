@@ -9,6 +9,7 @@ const bookingSchema = new mongoose.Schema({
     numberOfGuests: {type: Number, required:true},
     phone: {type: String, required:true},
     price: Number,
+    deleted: { type: Boolean, default: false }
 })
 
 const BookingModel = mongoose.model("Booking", bookingSchema);
