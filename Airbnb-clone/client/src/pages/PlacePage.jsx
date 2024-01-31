@@ -9,7 +9,6 @@ const PlacePage = () => {
     const { id } = useParams()
     const [place, setPlace] = useState(null)
     const [showAllPhotos, setShowAllPhotos] = useState(false)
-
     useEffect(() => {
         if (!id) {
             return
@@ -175,15 +174,25 @@ const PlacePage = () => {
                 </div>
             </div>
             {place.extraInfo && (
-                <div className="bg-white -mx-8 px-8 py-8 border-t">
-                    <div>
-                        <h2 className="font-semibold text-2xl">Extra info</h2>
+                <div>
+                    <div className="bg-white -mx-8 px-8 py-8 border-t">
+                        <div>
+                            <h2 className="font-semibold text-2xl">Extra info</h2>
+                        </div>
+                        <div className="mb-4 mt-2 text-sm text-gray-700 leading-5">{place.extraInfo}</div>
                     </div>
                     <div className="mb-4 mt-2 text-sm text-gray-700 leading-5">{place.extraInfo}</div>
                 </div>
             )}
+            <div>
+                <h1>Reviews</h1>
+                {place.reviews.map((review, index) => <div key={index}><p>{review.reviewText}</p><p>{review.rating}</p></div>)}
+            </div>
         </div>
+
     )
 }
+
+
 
 export default PlacePage

@@ -12,6 +12,10 @@ import BookingsPage from "./pages/BookingsPage"
 import BookingPage from "./pages/BookingPage"
 import Dashboard from "./pages/DashboardPage"
 import About from "./pages/About"
+import DashboardIndex from "./pages/DashboardPage"
+import { DashboardMain } from "./pages/DashboardMain"
+import { DashboardUsers } from "./pages/DashboardUsers"
+import { DashboardLodgings } from "./pages/DashboardLodgings"
 
 
 function App() {
@@ -38,6 +42,13 @@ function App() {
           <Route path="/dashboard/lodgins" element={<Dashboard />} />
           <Route path="/dashboard/owners" element={<Dashboard />} />
         </Route>
+      
+          <Route path="/dashboard" element={<DashboardIndex/>}>
+          <Route path="/dashboard/users" element={<DashboardUsers/>}/>
+          <Route path="/dashboard/lodgins" element={<DashboardLodgings/>}/>
+          
+          <Route path="/dashboard/main" element={<DashboardMain/>}/>
+          </Route>
       </Routes>
     </UserContextProvider>
   )

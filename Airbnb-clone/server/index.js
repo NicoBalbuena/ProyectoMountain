@@ -58,10 +58,10 @@ app.use(
 
 // Borrado lógico
 
-app.delete("/places/:id", deletePlace);
+app.patch("/places/:id", deletePlace);
 app.delete("/bookings/:id", deleteBooking);
 app.delete("/places/:placeId/reviews", deleteReview);
-app.delete("/users/:id", deleteUser);
+app.patch("/users/:id", deleteUser);
 
 // Manejo de errores de conexión a MongoDB
 
@@ -161,6 +161,9 @@ app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   const userDoc = await User.findOne({ email });
   if (userDoc) {
+    if(userDoc.deleted){
+      res.status(450).json("DESHABILITADO");
+    }
     const passOk = bcrypt.compareSync(password, userDoc.password);
     if (passOk) {
       jwt.sign(
@@ -408,6 +411,16 @@ app.put("/places", async (req, res) => {
 
 app.get("/places", async (req, res) => {
   try {
+      const places = await Place.find({deleted: false});
+      res.json(places);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.get("/placesAll", async (req, res) => {
+  try {
       const places = await Place.find();
       res.json(places);
   } catch (error) {
@@ -459,7 +472,8 @@ app.post("/bookings", async (req, res) => {
 
 app.get("/users", async (req, res) => {
   try {
-    const users = await UserModel.find({deleted: false});
+    const users = await User.find();
+    
     return res.status(200).json(users);
   } catch (error) {
     console.error("Error getting users", error)
@@ -470,13 +484,23 @@ app.get("/users", async (req, res) => {
 app.get("/users/:id", async (req,res) => {
   try {
     const { id } = req.params;
-    const user = await UserModel.findById(id);
+    const user = await User.findById(id);
     if(!user) return res.status(404).json({message: "User not found"});
 
     return res.status(200).json(user);
   } catch (error) {
     console.error("Error gettting user by id", error);
     res.status(500).json({message: "Internal Server Error"});
+  }
+})
+
+app.get("/usersAll", async (req, res) => {
+  try {
+    const users = await User.find();
+    return res.status(200).json(users);
+  } catch (error) {
+    console.error("Error getting users", error)
+    return res.status(500).json({message: "Error getting users"})
   }
 })
 

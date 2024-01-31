@@ -6,10 +6,11 @@ const UserModel = require("./models/user.js");
 const deletePlace = async (req, res) => {
     
     try {
+        const { value }=req.body
         const { id } = req.params;
         const place = await PlaceModel.findOneAndUpdate(
             { _id: id },
-            { $set: { deleted: true } },
+            { $set: { deleted: value } },
             { new: true }
         );
 
@@ -25,12 +26,13 @@ const deletePlace = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
-
     try {
+        const { value }=req.body
         const { id } = req.params;
+        console.log(id)
         const user = await UserModel.findOneAndUpdate(
             {_id: id},
-            { $set: { deleted: true }},
+            { $set: { deleted: value }},
             {new : true }
         );
 

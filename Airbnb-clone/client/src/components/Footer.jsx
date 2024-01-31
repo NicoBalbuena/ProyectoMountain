@@ -4,7 +4,7 @@ import { TwitterLogo } from "@phosphor-icons/react/dist/ssr";
 
 const Footer = () => {
   return (
-    <footer className="items-center flex flex-col border-t-2 mt-6 gap-1 pb-7 bg-primary absolute bottom-0 w-full">
+    <footer className="items-center flex flex-col border-t-2 pt-4 gap-1 pb-7 bg-primary mt-auto w-full">
       <div className="flex gap-2 mt-4">
         <FacebookLogo size={28} weight="fill" className="text-blue-600 cursor-pointer" />
         <TwitterLogo size={28} weight="fill" className="text-blue-500 cursor-pointer" />
