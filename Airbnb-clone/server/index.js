@@ -177,7 +177,6 @@ app.get("/profile", (req, res) => {
 
   if (token) {
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-      console.log("usetdata:",userData)
       if (err) throw err;
       const { name, email, id } = await User.findById(userData.id);
       res.json({ name, email, id });

@@ -1,6 +1,8 @@
 const { Router } = require("express");
 const passport = require("passport");
 const User = require("./models/user");
+const jwt = require("jsonwebtoken");
+const jwtSecret = "ksdojodksokdmc3";
 
 const authRouter = Router();
 
@@ -47,14 +49,17 @@ authRouter.post('/register/google', async (req, res) => {
                 console.error('Error al iniciar sesión:', err);
                 return res.status(500).json({ error: 'Error interno del servidor' });
             }
-
-            // Devolver la información del usuario autenticado, incluyendo el accessToken
-            return res.status(200).json({
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                accessToken: accessToken,
-            });
+            
+            jwt.sign(
+                { email: user.email, id: user._id },
+                jwtSecret,
+                {},
+                (err, token) => {
+                    if (err) throw err;
+                    res.cookie("token", token);
+                    res.json(user);
+                }
+            );
         });
     } catch (error) {
         console.error('Error durante el registro con Google:', error);
