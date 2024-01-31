@@ -280,6 +280,7 @@ const BookingPage = () => {
           {booking?.place?.extraInfo}
         </div>
       </div>
+      
     </div>
   );
 };
