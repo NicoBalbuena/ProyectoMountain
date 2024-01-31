@@ -7,6 +7,7 @@ import { gapi } from "gapi-script";
 import GoogleLogin from 'react-google-login';
 
 const LoginPage = () => {
+    
     const client_id = "1056894336848-o8gs701t5oahl4ih6hi330t92kth6oa8.apps.googleusercontent.com";
     // eslint-disable-next-line no-unused-vars
     const [userGoogle, setUserGoogle] = useState({});
