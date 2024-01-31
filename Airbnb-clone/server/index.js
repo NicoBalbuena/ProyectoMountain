@@ -270,6 +270,9 @@ app.get("/places/sort-by-guests-desc", async (req, res) => {
   }
 });
 
+//ruta para obtener todos las reviews
+app.get("/reviews", reviewController.getReviewsAll);
+
 app.post("/places/:placeId/reviews", reviewController.createReview);
 app.get("/places/:placeId/reviews", reviewController.getReviewsByPlace);
 // Rutas para obtener lugares ordenados por valor de revisión asc y desc
