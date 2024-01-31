@@ -1,53 +1,59 @@
-import { useState, useEffect } from "react"
-import axios from "axios"
-import { DashboardTable } from "../components/DashboardTable"
+/* eslint-disable no-unused-vars */
+import { useState, useEffect } from "react";
+import axios from "axios";
+
 
 export const DashboardUsers = () => {
-        const [columns,setColumns] = useState([])
-        const [data,setData] = useState([])
-    
-        useEffect(() => {
-            axios.get('http://localhost:4000/users')
-            .then((response) => {
-                const dataArray = Array.isArray(response.data) ? response.data : [];
-    
-                    // Definir las columnas que quieres mostrar
-                    const columnNames = ['Id', 'Name', 'Email'];
-    
-                    setColumns(columnNames);
-    
-                    // Transformar el array de objetos en un array bidimensional con los valores deseados
-                    const dataRows = dataArray.map(row => [
-                        row._id,
-                        row.name? row.name.toString() : '', // Convertir ObjectId a cadena si existe
-                        row.email || '',
-                    ]);
-    
-                    setData(dataRows);
-            })
-        
-        }, []);
-    
-    
-        const handleDeleteRow = async (rowIndex, placeId) => {
-            console.log(placeId);
-            try {
-              // Realiza la solicitud DELETE al servidor
-            await axios.delete(`http://localhost:4000/users/${placeId}`);
-        
-              // Actualiza el estado eliminando la fila
-            const newData = [...data];
-              newData.splice(rowIndex, 1); // Elimina la fila en el índice rowIndex
-            setData(newData);
-            } catch (error) {
-                console.error('Error deleting row:', error);
-            }
-        };
-    
-        console.log(data);
-        return (
-            <section className="flex flex-row gap-4 w-full overflow-hidden ">
-                <DashboardTable columns={columns} data={data} onDeleteRow={handleDeleteRow}/>
-            </section>
-        )
+
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    axios.get("http://localhost:4000/users").then((response) => {
+      setUsers(response.data);
+    });
+  }, []);
+
+  const handleDelete = async (placeId, value) => {
+    try {
+      // Realiza la solicitud DELETE al servidor
+      const response = await axios.patch(
+        `http://localhost:4000/users/${placeId}`,
+        { value }
+      );
+
+      const { data } = await axios.get("http://localhost:4000/users");
+      setUsers(data);
+    } catch (error) {
+      console.error("Error deleting row:", error);
     }
+  };
+
+  return (
+    <section className="flex flex-row gap-4 w-full overflow-hidden ">
+      <div className="">
+        <h2>usuarios</h2>
+        {users?.map((user, index) => (
+          <div key={index}  className="">
+            <span>NAME: {user.name}</span>
+            <span>EMAIL: {user.email}</span>
+            {user.deleted ? (
+              <button
+                className="border border-black bg-green-600"
+                onClick={() => handleDelete(user._id, false)}
+              >
+                ACTIVAR
+              </button>
+            ) : (
+              <button
+                className="border border-black bg-red-600"
+                onClick={() => handleDelete(user._id, true)}
+              >
+                DESACTIVAR
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};

@@ -39,9 +39,13 @@ const LoginPage = () => {
             );
             setUser(data);
             alert("Login successful");
+            if(data.email==="admin@admin.com"){
+                navigate("/dashboard/main")
+            }
             setRedirect(true);
         } catch (error) {
-            alert("Login failed");
+            console.log(error)
+            alert(error.response.data);
         }
     };
 

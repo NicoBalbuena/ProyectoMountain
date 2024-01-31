@@ -58,10 +58,10 @@ app.use(
 
 // Borrado lógico
 
-app.delete("/places/:id", deletePlace);
+app.patch("/places/:id", deletePlace);
 app.delete("/bookings/:id", deleteBooking);
 app.delete("/places/:placeId/reviews", deleteReview);
-app.delete("/users/:id", deleteUser);
+app.patch("/users/:id", deleteUser);
 
 // Manejo de errores de conexión a MongoDB
 
@@ -161,6 +161,9 @@ app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   const userDoc = await User.findOne({ email });
   if (userDoc) {
+    if(userDoc.deleted){
+      res.status(450).json("DESHABILITADO");
+    }
     const passOk = bcrypt.compareSync(password, userDoc.password);
     if (passOk) {
       jwt.sign(
@@ -469,7 +472,8 @@ app.post("/bookings", async (req, res) => {
 
 app.get("/users", async (req, res) => {
   try {
-    const users = await User.find({deleted: false});
+    const users = await User.find();
+    
     return res.status(200).json(users);
   } catch (error) {
     console.error("Error getting users", error)
