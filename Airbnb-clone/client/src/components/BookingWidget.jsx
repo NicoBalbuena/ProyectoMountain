@@ -1,3 +1,4 @@
+
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react"
 import { differenceInCalendarDays } from "date-fns";
@@ -10,6 +11,7 @@ import { UserContext } from "./UserContext";
 const BookingWidget = ({ place }) => {
     // Almacenar el placeId en localStorage
     localStorage.setItem('placeId', place._id);
+    console.log("se almacena ok",place._id)
     console.log("se almacena ok",place._id)
     
     const [checkIn, setCheckIn] = useState("")
@@ -31,6 +33,7 @@ const BookingWidget = ({ place }) => {
             setName(user.name);
         }
     }, [user]);
+    
     
 
     let numberOfNights = 0
@@ -59,6 +62,7 @@ const BookingWidget = ({ place }) => {
             const bookingId = response.data._id
             setRedirect(`/account/bookings/${bookingId}`)
         }
+        
     }
 
     const handlePaymentMethodSelection = async (method) => {
