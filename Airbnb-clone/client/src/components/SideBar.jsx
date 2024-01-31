@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-key */
 import { Link, useLocation } from "react-router-dom";
 import { IoHome } from "react-icons/io5";
 import { DASHBOARD_SIDEBAR_LINKS } from "../lib/consts/navigation";
@@ -11,7 +10,7 @@ const linksClasses =
 export const SideBar = () => {
   return (
     <aside className="flex flex-col bg-neutral-900 w-60 p-3 max-h-screen text-white sticky top-0">
-
+      {/* Enlace para "/": */}
       <Link to="/" className="flex items-center gap-2 px-1 py-3">
         <IoHome fontSize={25} />
         <span className="text-neutral-100 text-lg">MountainHaven</span>
@@ -23,12 +22,7 @@ export const SideBar = () => {
           </ul>
         ))}
       </section>
-      {/* <section className={classNames("text-red-700 text-lg", linksClasses)}>
-        <span className="">
-          {<RiLogoutBoxLine fontSize={24} color="red" />}
-        </span>
-        Logout
-      </section> */}
+      
     </aside>
   );
 };
