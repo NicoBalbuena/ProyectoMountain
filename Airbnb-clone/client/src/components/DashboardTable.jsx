@@ -2,7 +2,7 @@ export const DashboardTable = ({ columns, data, onDeleteRow }) => {
     return (
       <div className="bg-white px-4 pt-3 pb-4 rounded-sm border border-x-gray-200 flex-1">
         <div className="mt-3"></div>
-        <table className="w-full h-full text-gray-700  ">
+        <table className=" w-full h-full text-gray-700  ">
           <thead>
             <tr>
               {columns.map((column, index) => (
@@ -11,11 +11,11 @@ export const DashboardTable = ({ columns, data, onDeleteRow }) => {
               <th>Action</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="">
             {data.map((row, index) => (
-              <tr key={index}>
+              <tr className="" key={index}>
                 {row.map((data, i) => (
-                  <td className="border border-sky-500 px-3"  key={i}>{data}</td>
+                  <td className="px-3"  key={i}>{data}</td>
                 ))}
                 {index >= 0 && (
                   <td>
