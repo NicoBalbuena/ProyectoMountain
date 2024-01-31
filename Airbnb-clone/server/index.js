@@ -412,7 +412,7 @@ app.put("/places", async (req, res) => {
 
 app.get("/places", async (req, res) => {
   try {
-      const places = await Place.find({deleted: false});
+      const places = await Place.find();
       res.json(places);
   } catch (error) {
       console.error(error);
