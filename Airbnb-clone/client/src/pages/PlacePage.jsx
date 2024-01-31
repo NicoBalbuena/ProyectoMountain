@@ -9,12 +9,11 @@ const PlacePage = () => {
     const { id } = useParams()
     const [place, setPlace] = useState(null)
     const [showAllPhotos, setShowAllPhotos] = useState(false)
-    console.log("antes del efecct", id)
+    console.log("antes del efecct", place)
     useEffect(() => {
         if (!id) {
-            console.log("if", id)
             return
-        } console.log("despues del return", id)
+        }
         axios.get(`http://localhost:4000/places/${id}`)
             .then(res => {
                 setPlace(res.data)
@@ -107,6 +106,11 @@ const PlacePage = () => {
                     <h2 className="font-semibold text-2xl">Extra info</h2>
                 </div>
                 <div className="mb-4 mt-2 text-sm text-gray-700 leading-5">{place.extraInfo}</div>
+            </div>
+            <div>
+                <h1>Reviews</h1>
+                {place.reviews.map((review,index)=> <div key={index}><p>{review.reviewText}</p><p>{review.rating}</p></div>)}
+                
             </div>
         </div>
     )
