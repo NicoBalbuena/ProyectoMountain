@@ -9,8 +9,6 @@ const createReview = async (req, res) => {
     const { data } = req.body;
     const { placeId } = req.params;
     const { rating, reviewText } = data;
-    console.log(data)
-    console.log(token)
     try {
         
         // Verificar el token y obtener el ID del usuario
@@ -28,12 +26,11 @@ const createReview = async (req, res) => {
                 reviewText,
             });
 
-            console.log("userData:", userData);
+            
 
             // Asociar la revisión al lugar
             const place = await Place.findById(placeId);
             place.reviews.push(reviewDoc._id);
-            
             // Guardar el lugar con la nueva revisión
             await place.save();
 
@@ -57,6 +54,20 @@ const getReviewsByPlace = async (req, res) => {
         const avgRating = reviews.length > 0 ? totalRating / reviews.length : 0;
 
         res.json({ reviews, avgRating });
+    } catch (error) {
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+const getReviewsAll = async (req, res) => {
+
+    try {
+        // Obtener todas las revisiones para una cabaña específica, incluyendo la información del usuario
+        const reviews = await Review.find().populate("user");
+
+        // Calcular el avgRating para todas las revisiones de esta cabaña
+
+        res.json({ reviews });
     } catch (error) {
         res.status(500).json({ error: "Internal Server Error" });
     }
@@ -136,4 +147,4 @@ const getPlacesSortedByReviewDesc = async (req, res) => {
 
 
 
-module.exports = { createReview, getReviewsByPlace, getPlacesSortedByReviewAsc, getPlacesSortedByReviewDesc };
+module.exports = { createReview, getReviewsByPlace, getPlacesSortedByReviewAsc, getPlacesSortedByReviewDesc, getReviewsAll };
