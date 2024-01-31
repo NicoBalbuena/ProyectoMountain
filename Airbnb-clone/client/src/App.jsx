@@ -13,7 +13,6 @@ import BookingPage from "./pages/BookingPage"
 import DashboardIndex from "./pages/DashboardPage"
 import { DashboardMain } from "./pages/DashboardMain"
 import { DashboardUsers } from "./pages/DashboardUsers"
-import { DashboardOwners } from "./pages/DashboardOwners"
 import { DashboardLodgings } from "./pages/DashboardLodgings"
 
 
@@ -38,7 +37,7 @@ function App() {
           <Route path="/dashboard" element={<DashboardIndex/>}>
           <Route path="/dashboard/users" element={<DashboardUsers/>}/>
           <Route path="/dashboard/lodgins" element={<DashboardLodgings/>}/>
-          <Route path="/dashboard/owners" element={<DashboardOwners/>}/>
+          
           <Route path="/dashboard/main" element={<DashboardMain/>}/>
           </Route>
       </Routes>
