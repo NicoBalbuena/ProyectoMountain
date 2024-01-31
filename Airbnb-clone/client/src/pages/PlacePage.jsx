@@ -16,9 +16,10 @@ const PlacePage = () => {
         axios.get(`http://localhost:4000/places/${id}`)
             .then(res => {
                 setPlace(res.data)
+                
             })
     }, [id])
-
+    
     if (!place) return "";
 
     if (showAllPhotos) {
@@ -185,6 +186,7 @@ const PlacePage = () => {
                 </div>
             )}
             <div>
+                {console.log(place)}
                 <h1>Reviews</h1>
                 {place.reviews.map((review, index) => <div key={index}><p>{review.reviewText}</p><p>{review.rating}</p></div>)}
             </div>
