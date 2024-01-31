@@ -12,16 +12,24 @@ const PlacesFormPage = () => {
     title: "",
     address: "",
     photos: [],
-    photosLink: "",
     description: "",
     perks: [],
     extraInfo: "",
     type: "",
-    checkIn: "",
-    checkOut: "",
     guests: 1,
     price: 100,
   });
+
+  const [errors, setErrors] = useState({
+    title: "",
+    address: "",
+    photos: "",
+    description: "",
+    perks: "",
+    type: "",
+    guests: "",
+    price: ""
+  })
 
   useEffect(() => {
     if (!id) {
@@ -34,7 +42,6 @@ const PlacesFormPage = () => {
         title: data.title,
         address: data.address,
         photos: data.photos,
-        photosLink: "",
         description: data.description,
         perks: data.perks,
         extraInfo: data.extraInfo,
@@ -67,26 +74,6 @@ const PlacesFormPage = () => {
     });
   };
 
-  const addPhotoByLink = async (e) => {
-    e.preventDefault();
-    try {
-      const { data: filename } = await axios.post(
-        "/uploads-by-link",
-        { link: input.photosLink },
-        { withCredentials: true }
-      );
-      setInput((prev) => {
-        return {
-          ...prev,
-          photos: [...prev.photos, filename],
-          photosLink: "",
-        };
-      });
-      alert("Photo uploaded successfully");
-    } catch (error) {
-      alert("Error uploading photo");
-    }
-  };
 
   const uploadPhoto = (e) => {
     const files = e.target.files;
@@ -126,27 +113,67 @@ const PlacesFormPage = () => {
   };
 
   const savePlace = async (e) => {
-    console.log(e)
     e.preventDefault();
-    try {
-      if (id) {
-        await axios.put(
-          "http://localhost:4000/places",
-          { data: input, id },
-          { withCredentials: true }
-        );
-      } else {
-        await axios.post(
-          "http://localhost:4000/places",
-          { data: input },
-          { withCredentials: true }
-        );
+    const newErrors = {}
+
+    if (input.title === "") {
+      newErrors.title = "The field cannot be empty"
+    }
+
+    if (input.address === "") {
+      newErrors.address = "The field cannot be empty";
+    }
+
+    if (input.photos.length < 5) {
+      newErrors.photos = "You must have at least 5 photos"
+    }
+
+    if (input.description === "") {
+      newErrors.description = "The field cannot be empty";
+    }
+
+    if (input.perks.length < 1) {
+      newErrors.perks = "Select at least 1 service"
+    }
+
+    if (input.type === "") {
+      newErrors.type = "You must select a type"
+    }
+
+    if (input.guests <= 0) {
+      newErrors.guests = "Can't be 0"
+    }
+
+    if (input.guests > 10) {
+      newErrors.guests = "Cannot be greater than 10"
+    }
+
+    if (input.price <= 0) {
+      newErrors.price = "Can't be 0"
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      alert("Fix your mistakes first")
+    } else {
+      try {
+        if (id) {
+          await axios.put(
+            "http://localhost:4000/places",
+            { data: input, id },
+            { withCredentials: true }
+          );
+        } else {
+          await axios.post(
+            "http://localhost:4000/places",
+            { data: input },
+            { withCredentials: true }
+          );
+        }
+        setRedirect(true);
+      } catch (error) {
+        console.error("Error saving place: ", error);
       }
-      setRedirect(true);
-    } catch (error) {
-      console.error("Error saving place: ", error);
-      // Aquí puedes manejar el error de acuerdo a tus necesidades,
-      // como mostrar un mensaje de error al usuario, volver a cargar la página, etc.
     }
   };
 
@@ -189,6 +216,7 @@ const PlacesFormPage = () => {
           value={input.title}
           onChange={handleChange}
         />
+        {errors.title && <p className="text-red-600">{errors.title}</p>}
         <h2 className="text-2xl mt-4">Address</h2>
         <input
           type="text"
@@ -197,23 +225,8 @@ const PlacesFormPage = () => {
           value={input.address}
           onChange={handleChange}
         />
+        {errors.address && <p className="text-red-600">{errors.address}</p>}
         <h2 className="text-2xl mt-4">Photos</h2>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Add using a link .... jpg"
-            name="photosLink"
-            value={input.photosLink}
-            onChange={handleChange}
-          />
-          <button
-            onClick={addPhotoByLink}
-            className="bg-gray-200 px-4 rounded-2xl"
-          >
-            Add photo
-          </button>
-        </div>
-
         <div className="mt-2 grid gap-2 grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
           {input.photos.length > 0 &&
             input.photos.map((link) => (
@@ -306,6 +319,7 @@ const PlacesFormPage = () => {
             Upload
           </label>
         </div>
+        {errors.photos && <p className="text-red-600">{errors.photos}</p>}
         <h2 className="text-2xl mt-4">Description</h2>
         <textarea
           placeholder="description of the place"
@@ -313,11 +327,13 @@ const PlacesFormPage = () => {
           value={input.description}
           onChange={handleChange}
         />
+        {errors.description && <p className="text-red-600">{errors.description}</p>}
         <h2 className="text-2xl mt-4">Perks</h2>
         <p className="text-gray-500 text-sm">
           select all the perks of your place
         </p>
         <Perks selected={input.perks} onChange={handlePerksChange} />
+        {errors.perks && <p className="text-red-600">{errors.perks}</p>}
         <h2 className="text-2xl mt-4">Extra info</h2>
         <textarea
           placeholder="house, rules, etc"
@@ -349,6 +365,7 @@ const PlacesFormPage = () => {
             cabin
           </button>
         </div>
+        {errors.type && <p className="text-red-600">{errors.type}</p>}
         <h2 className="text-2xl mt-4">Guests & price</h2>
         <p className="text-gray-500 text-sm">
           How many people can stay here? & What will be the price per night?
@@ -362,6 +379,7 @@ const PlacesFormPage = () => {
               value={input.guests}
               onChange={handleChange}
             />
+          {errors.guests && <p className="text-red-600">{errors.guests}</p>}
           </div>
           <div>
             <h3 className="mt-2 -mb-1 text-center">Price per night</h3>
@@ -371,6 +389,7 @@ const PlacesFormPage = () => {
               value={input.price}
               onChange={handleChange}
             />
+          {errors.price && <p className="text-red-600">{errors.price}</p>}
           </div>
         </div>
 
