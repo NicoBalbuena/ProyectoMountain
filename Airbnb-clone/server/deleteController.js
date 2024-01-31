@@ -53,6 +53,10 @@ const deleteReview = async (req, res) => {
             { $set: { deleted: true }},
             { new: true }
         );
+
+        if(!review) return res.status(404).json({message: "Review not found"});
+
+        return res.status(200).json({message: "Review deleted succesfully"});
     } catch (error) {
         console.error("Error deleting review", error);
         return res.status(500).json({ message: "Internal Server Error"});
@@ -67,6 +71,9 @@ const deleteBooking = async (req, res) => {
             { $set: { deleted: true }},
             { new: true }
         );
+        if(!booking) return res.status(404).json({message: "Booking not found"});
+
+        return res.status(200).json({message: "Booking deleted succesfully"});
     } catch (error) {
         console.error("Error deleting booking", error);
         return res.status(500).json({ message: "Internal Server Error"});

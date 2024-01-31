@@ -505,7 +505,7 @@ app.get("/bookings", async (req, res) => {
     const { id } = userData;
 
     try {
-      const bookings = await Booking.find({ user: id }).populate("place");
+      const bookings = await Booking.find({ user: id, deleted: false }).populate("place");
       res.json(bookings);
     } catch (error) {
       console.error("Error fetching bookings:", error);
