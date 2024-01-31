@@ -11,7 +11,7 @@ const Banner = () => {
                     <h5 className="text-white font-semibold text-lg">
                         Plan a different kind of getaway to uncover the hidden gems near you
                     </h5>
-                    <button className="bg-primary w-fit  text-black p-2 rounded-md mt-6 hover:bg-yellow-400">
+                    <button className="bg-primary w-fit  text-black p-2 rounded-md mt-6 hover:bg-yellow-300 transition">
                         Explore Nearby
                     </button>
                 </div>

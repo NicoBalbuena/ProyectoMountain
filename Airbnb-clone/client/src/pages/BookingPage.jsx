@@ -30,7 +30,7 @@ const BookingPage = () => {
 
   if (showAllPhotos) {
     return (
-      <div className="absolute inset-0 z-50 text-white min-h-screen">
+      <div className="absolute inset-0 text-white min-h-screen z-10">
         <div className="bg-black p-8 grid gap-4">
           <div>
             <h2 className="text-3xl mr-48">
@@ -166,7 +166,7 @@ const BookingPage = () => {
         </div>
 
         <div>
-          <div className="bg-white shadow p-4 rounded-2xl">
+          <div className="bg-white shadow shadow-black p-4 rounded-2xl">
             <div className="text-2xl text-center">
               Your booking information:
             </div>

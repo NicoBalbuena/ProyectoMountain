@@ -94,9 +94,10 @@ const LoginPage = () => {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                     <button className="primary">Login</button>
-                    <p>Or</p>
-                    <div>
+                
+                    <div className="mt-5 w-auto flex justify-center">
                         <GoogleLogin
+                            className="flex justify-center w-96"
                             clientId={client_id}
                             onSuccess={onSuccess}
                             onFailure={() => console.log("Google login failed")}

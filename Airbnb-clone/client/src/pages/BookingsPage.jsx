@@ -78,9 +78,9 @@ const BookingsPage = () => {
     return (
         <div className="mb-[150px]">
             <AccountNav />
-            <div className="">
+            <div className="mx-5">
                 {bookings?.length > 0 && bookings.map((booking, index) => (
-                    <div key={booking._id} className="flex gap-4 bg-gray-200 rounded-2xl overflow-hidden mt-3">
+                    <div key={booking._id} className="flex gap-4 shadow shadow-black rounded-2xl overflow-hidden mt-3">
                         <div className="w-48">
                             <PlaceImg place={booking.place} />
                         </div>

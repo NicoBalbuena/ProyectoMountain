@@ -1,13 +1,17 @@
 import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { UserContext } from "./UserContext";
 
 
 const Header = () => {
 
+    const { pathname } = useLocation()
+
     const { user } = useContext(UserContext)
 
     return (
+        <div>
+
         <header className="flex justify-between py-3 px-5">
             <Link to={"/"} className="flex items-center gap-1">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -17,18 +21,9 @@ const Header = () => {
                 <span className="font-bold text-xl">MountainHaven</span>
             </Link>
 
-            <div className="flex gap-2 border border-gray-300 rounded-full py-2 px-4 shadow-md shadow-gray-400">
-                <div>Anywhere</div>
-                <div className="border-l border-gray-300"></div>
-                <div>Any week</div>
-                <div className="border-l border-gray-300"></div>
-                <div>Add guests</div>
-                <button className="bg-primary text-gray-600 p-1 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                    </svg>
-                </button>
-            </div>
+            <Link to={pathname !== `/about` ? "/about" : `/`} className="flex items-center gap-2 border bg-primary border-gray-300 rounded-full py-2 px-8 hover:bg-yellow-300 transition ">
+                About
+            </Link>
 
             <Link to={user ? "/account" : "/login"} className="flex items-center gap-2 border border-gray-300 rounded-full py-2 px-4 ">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -45,8 +40,10 @@ const Header = () => {
                     </div>
                 )}
             </Link>
-
+        
         </header>
+        <hr />
+        </div>
 
     )
 }
