@@ -21,7 +21,7 @@ const About = () => {
     ]);
 
     return (
-        <div className='grid grid-cols-3 mx-auto gap-4 p-4 items-center mt-10 w-[1000px]'>
+        <div className='grid grid-cols-3 mx-auto gap-20 p-4 items-center mt-10 w-auto'>
             {results.map((result, index) => (
                 <div key={index} className='flex flex-col items-center' >
                     <img src={result.photo} alt="image.jpg" className='w-48 h-48 object-cover rounded-2xl' />
