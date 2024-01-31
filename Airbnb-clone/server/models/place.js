@@ -13,6 +13,7 @@ const placeSchema = new mongoose.Schema({
     price: Number,
     reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
     avgRating: Number,
+    deleted: { type: Boolean, default: false }
 });
 
 // Middleware init para ejecutar código cada vez que se inicializa un documento Place
