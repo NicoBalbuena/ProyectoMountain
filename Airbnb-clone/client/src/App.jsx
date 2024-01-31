@@ -34,7 +34,6 @@ function App() {
           <Route path="/account/bookings" element={<BookingsPage />} />
           <Route path="/account/bookings/:id" element={<BookingPage />} />
           <Route path="/about" element={<About/>} />
-
         </Route>
       
           <Route path="/dashboard" element={<DashboardIndex/>}>

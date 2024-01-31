@@ -3,7 +3,6 @@ import AccountNav from "../components/AccountNav";
 import axios from "axios";
 import PlaceImg from "../components/PlaceImg";
 import { differenceInCalendarDays, format } from "date-fns";
-// eslint-disable-next-line no-unused-vars
 import { Link } from "react-router-dom";
 
 const BookingsPage = () => {
@@ -23,15 +22,18 @@ const BookingsPage = () => {
             })
     }, []);
 
-    const handleSubmit = async (event, review, rating) => {
+    const handleSubmit = async (event, reviewText, rating) => {
         event.preventDefault();
         setIsSubmitting(true);
         setSubmitError(null);
+        console.log(event)
+        console.log(reviewText)
+        console.log(rating)
         
         try {
             const response = await axios.post(`http://localhost:4000/places/${placeId}/reviews`, {
                 data: {
-                    review,
+                    reviewText,
                     rating,
                 }
             },{ withCredentials: true });
