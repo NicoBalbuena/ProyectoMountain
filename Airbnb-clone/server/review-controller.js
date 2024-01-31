@@ -15,7 +15,10 @@ const createReview = async (req, res) => {
         
         // Verificar el token y obtener el ID del usuario
         jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-            if (err) throw err;
+            if (err) {
+                console.error("Error al verificar el token:", err);
+                throw err;
+            }
 
             // Crear la revisión
             const reviewDoc = await Review.create({
@@ -24,6 +27,8 @@ const createReview = async (req, res) => {
                 rating,
                 reviewText,
             });
+
+            console.log("userData:", userData);
 
             // Asociar la revisión al lugar
             const place = await Place.findById(placeId);
@@ -35,7 +40,8 @@ const createReview = async (req, res) => {
             res.json(reviewDoc);
         });
     } catch (error) {
-        res.status(422).json({ error: error.message });
+        console.error("Error al crear la revisión:", error);
+        res.status(422).json({ error: "No se pudo crear la revisión" });
     }
 };
 
