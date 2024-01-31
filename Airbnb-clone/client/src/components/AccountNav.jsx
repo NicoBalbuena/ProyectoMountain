@@ -12,7 +12,7 @@ const AccountNav = () => {
     const linkClasses = (type = null) => {
         let classes = 'inline-flex gap-1 py-2 px-6 rounded-full'
         if (type === subpage) {
-            classes += ' bg-primary text-white '
+            classes += ' bg-primary text-black '
         } else {
             classes += ' bg-gray-200'
         }

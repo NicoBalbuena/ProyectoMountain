@@ -7,6 +7,9 @@ import { useContext } from "react";
 import { UserContext } from "./UserContext";
 
 const BookingWidget = ({ place }) => {
+    // Almacenar el placeId en localStorage
+    localStorage.setItem('placeId', place._id);
+    console.log("se almacena ok",place._id)
 
     const [checkIn, setCheckIn] = useState("")
     const [checkOut, setCheckOut] = useState("")
@@ -15,11 +18,19 @@ const BookingWidget = ({ place }) => {
     const [phone, setPhone] = useState("")
     const [redirect, setRedirect] = useState("")
     const [paymentMethod, setPaymentMethod] = useState("") // Estado para almacenar el método de pago seleccionado
-    const {user} = useContext(UserContext)
+    const { user } = useContext(UserContext)
+
+    const [errors, setErrors] = useState({
+        numberOfGuests: "",
+        phone: ""
+    })
 
     useEffect(() => {
-        setName(user.name)
-    }, [user])
+        if (user && user.name) {
+            setName(user.name);
+        }
+    }, [user]);
+    
 
     let numberOfNights = 0
 
@@ -28,44 +39,59 @@ const BookingWidget = ({ place }) => {
     }
 
     const bookThisPlace = async () => {
-        const response = await axios.post("http://localhost:4000/bookings", { checkIn,
-         checkOut, numberOfGuests, name, phone, place: place._id, price: numberOfNights * place.price }, { withCredentials: true })
-        const bookingId = response.data._id
-        setRedirect(`/account/bookings/${bookingId}`)
+        const newErrors = {}
+
+        if (numberOfGuests > place.guests) {
+            newErrors.numberOfGuests = "Exceeds the maximum number of guests"
+        }
+
+        if (!phone) {
+            newErrors.phone = "Campo vacio"
+        } 
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors)
+        } else {
+            const response = await axios.post("http://localhost:4000/bookings", {
+                checkIn,
+                checkOut, numberOfGuests, name, phone, place: place._id, price: numberOfNights * place.price * numberOfGuests
+            }, { withCredentials: true })
+            const bookingId = response.data._id
+            setRedirect(`/account/bookings/${bookingId}`)
+        }
     }
 
     const handlePaymentMethodSelection = async (method) => {
-      setPaymentMethod(method);
-      if (method === "mercadopago") {
-          try {
-              // Calcular el precio total basado en el número de noches seleccionadas y el precio del lugar
-              const totalPrice = numberOfNights * place.price;
-  
-              const response = await axios.post(
-                  `http://localhost:4000/mp/create-order/${place._id}`,
-                  { 
-                      name,
-                      totalPrice, // Enviar el precio total a Mercado Pago
-                  },
-                  { withCredentials: true }
-              );
-              // Verificar si hay una URL de pago en la respuesta
-              const paymentUrl = response.data.paymentUrl;
-              if (paymentUrl) {
-                  // Abrir la página de Mercado Pago en una nueva pestaña
-                  window.open(paymentUrl, "_blank");
-              } else {
-                  console.error("No se recibió una URL de pago válida en la respuesta.");
-              }
-          } catch (error) {
-              // Manejar errores de la solicitud
-              console.error("Error:", error);
-          }
-      }
+        setPaymentMethod(method);
+        if (method === "mercadopago") {
+            try {
+                // Calcular el precio total basado en el número de noches seleccionadas y el precio del lugar
+                const totalPrice = numberOfNights * place.price * numberOfGuests;
+
+                const response = await axios.post(
+                    `http://localhost:4000/mp/create-order/${place._id}`,
+                    {
+                        name,
+                        totalPrice, // Enviar el precio total a Mercado Pago
+                    },
+                    { withCredentials: true }
+                );
+                // Verificar si hay una URL de pago en la respuesta
+                const paymentUrl = response.data.paymentUrl;
+                if (paymentUrl) {
+                    // Abrir la página de Mercado Pago en una nueva pestaña
+                    window.open(paymentUrl, "_blank");
+                } else {
+                    console.error("No se recibió una URL de pago válida en la respuesta.");
+                }
+            } catch (error) {
+                // Manejar errores de la solicitud
+                console.error("Error:", error);
+            }
+        }
     }
-  
-  
-  
+
+
+
 
     if (redirect) {
         return <Navigate to={redirect} />
@@ -91,7 +117,8 @@ const BookingWidget = ({ place }) => {
                 </div>
                 <div className="py-3 px-4 border-t">
                     <label>Number of guests</label>
-                    <input type="number" value={numberOfGuests} onChange={ev => setNumberOfGuests(ev.target.value)} />
+                    <input type="number" min={1} max={place.guests} value={numberOfGuests} onChange={ev => setNumberOfGuests(ev.target.value)} />
+                    {errors.numberOfGuests && <p className="text-red-600">{errors.numberOfGuests}</p>}
                 </div>
                 {numberOfNights > 0 && (
                     <div className="py-3 px-4 border-t">
@@ -99,6 +126,7 @@ const BookingWidget = ({ place }) => {
                         <input type="text" value={name} onChange={ev => setName(ev.target.value)} />
                         <label>Phone number</label>
                         <input type="tel" value={phone} onChange={ev => setPhone(ev.target.value)} />
+                        {errors.phone && <p className="text-red-600">{errors.phone}</p>}
                         <div className="mt-4">
                             <p>Select payment method:</p>
                             <button onClick={() => handlePaymentMethodSelection("mercadopago")} className={`mr-2 ${paymentMethod === "mercadopago" ? "bg-blue-500" : "bg-gray-300"} text-white py-2 px-4 rounded`}>Mercado Pago</button>
@@ -112,11 +140,11 @@ const BookingWidget = ({ place }) => {
                     </div>
                 )}
             </div>
-            
+
             <button onClick={bookThisPlace} className="primary mt-4">
                 Book this place
                 {numberOfNights > 0 && (
-                    <span> ${numberOfNights * place.price}</span>
+                    <span> for ${numberOfNights * place.price * numberOfGuests} for {numberOfNights} night</span>
                 )}
             </button>
         </div>

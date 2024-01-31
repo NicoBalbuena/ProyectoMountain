@@ -25,6 +25,7 @@ const cloudinary = require("./middleware/cloudinary-middleware");
 const nodemailer = require("nodemailer");
 const filtros = require("./filtros");
 
+
 app.use(
   session({
     secret: process.env.JWT_SECRET,
@@ -266,6 +267,7 @@ app.get("/places/:placeId/reviews", reviewController.getReviewsByPlace);
 app.get("/places/by-avg-rating/:avgRating", filtros.getPlacesByAvgRating);
 app.get("/places/min-guests/:minGuests", filtros.getPlacesByGuests);
 app.get("/places/available/:checkIn/:checkOut", filtros.getAvailablePlaces);
+app.get("/places/filter", filtros.getFilteredPlaces)
 
 app.get(
   "/places/sort-by-review-desc",
@@ -306,8 +308,7 @@ app.post("/places", cloudinary, (req, res) => {
     description,
     perks,
     extraInfo,
-    checkIn,
-    checkOut,
+    type,
     guests,
     price,
   } = data;
@@ -322,8 +323,7 @@ app.post("/places", cloudinary, (req, res) => {
       description,
       perks,
       extraInfo,
-      checkIn,
-      checkOut,
+      type,
       guests,
       price,
     });
@@ -376,8 +376,7 @@ app.put("/places", async (req, res) => {
     description,
     perks,
     extraInfo,
-    checkIn,
-    checkOut,
+    type,
     guests,
     price,
   } = data;
@@ -393,8 +392,7 @@ app.put("/places", async (req, res) => {
         description,
         perks,
         extraInfo,
-        checkIn,
-        checkOut,
+        type,
         guests,
         price,
       });
