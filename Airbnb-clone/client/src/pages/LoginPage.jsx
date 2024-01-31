@@ -40,7 +40,7 @@ const LoginPage = () => {
             setUser(data);
             alert("Login successful");
             if(data.email==="admin@admin.com"){
-                navigate("/dashboard")
+                navigate("/dashboard/main")
             }
             setRedirect(true);
         } catch (error) {
