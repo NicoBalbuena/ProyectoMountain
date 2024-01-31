@@ -1,5 +1,5 @@
 //components
-import Tables from "../components/Table";
+
 import { SideBar } from "../components/SideBar";
 import { Outlet } from "react-router-dom";
 

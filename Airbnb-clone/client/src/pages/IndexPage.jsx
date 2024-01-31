@@ -18,8 +18,8 @@ const IndexPage = () => {
 
   const fetchPlaces = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/places/");
-      setPlaces(response.data); // Actualizamos el estado con los lugares obtenidos
+      const response = await axios.get("http://localhost:4000/placesAll/");
+      setPlaces(response.data.filter((place) => !place.deleted)); // Actualizamos el estado con los lugares obtenidos
     } catch (error) {
       console.error("Error al obtener los lugares:", error);
     }
@@ -77,6 +77,7 @@ const IndexPage = () => {
   };
 
   //limpiar filtros
+  // eslint-disable-next-line no-unused-vars
   const handleClearFilters = async () => {
     fetchPlaces(); // Volvemos a obtener los lugares sin ningún filtro
   };
