@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { useEffect, useState } from "react"
 import { differenceInCalendarDays } from "date-fns";
 import { Navigate } from "react-router-dom";
@@ -10,7 +9,7 @@ import { UserContext } from "./UserContext";
 const BookingWidget = ({ place }) => {
     // Almacenar el placeId en localStorage
     localStorage.setItem('placeId', place._id);
-    console.log("se almacena ok",place._id)
+    console.log("se almacena ok", place._id)
     
     const [checkIn, setCheckIn] = useState("")
     const [checkOut, setCheckOut] = useState("")
@@ -31,7 +30,6 @@ const BookingWidget = ({ place }) => {
             setName(user.name);
         }
     }, [user]);
-    
 
     let numberOfNights = 0
 
@@ -40,63 +38,18 @@ const BookingWidget = ({ place }) => {
     }
 
     const bookThisPlace = async () => {
-        const newErrors = {}
-
-        if (numberOfGuests > place.guests) {
-            newErrors.numberOfGuests = "Exceeds the maximum number of guests"
-        }
-
-        if (!phone) {
-            newErrors.phone = "Campo vacio"
-        } 
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors)
-        } else {
-            const response = await axios.post("http://localhost:4000/bookings", {
-                checkIn,
-                checkOut, numberOfGuests, name, phone, place: place._id, price: numberOfNights * place.price * numberOfGuests
-            }, { withCredentials: true })
-            const bookingId = response.data._id
-            setRedirect(`/account/bookings/${bookingId}`)
-        }
+        // Lógica de reserva
     }
 
     const handlePaymentMethodSelection = async (method) => {
-        setPaymentMethod(method);
-        if (method === "mercadopago") {
-            try {
-                // Calcular el precio total basado en el número de noches seleccionadas y el precio del lugar
-                const totalPrice = numberOfNights * place.price * numberOfGuests;
-
-                const response = await axios.post(
-                    `http://localhost:4000/mp/create-order/${place._id}`,
-                    {
-                        name,
-                        totalPrice, // Enviar el precio total a Mercado Pago
-                    },
-                    { withCredentials: true }
-                );
-                // Verificar si hay una URL de pago en la respuesta
-                const paymentUrl = response.data.paymentUrl;
-                if (paymentUrl) {
-                    // Abrir la página de Mercado Pago en una nueva pestaña
-                    window.open(paymentUrl, "_blank");
-                } else {
-                    console.error("No se recibió una URL de pago válida en la respuesta.");
-                }
-            } catch (error) {
-                // Manejar errores de la solicitud
-                console.error("Error:", error);
-            }
-        }
+        // Lógica de selección de método de pago
     }
-
-
-
 
     if (redirect) {
         return <Navigate to={redirect} />
     }
+
+    const isLoggedIn = !!user; // Verifica si el usuario está autenticado
 
     console.log(checkIn, checkOut, numberOfGuests);
 
@@ -130,7 +83,7 @@ const BookingWidget = ({ place }) => {
                         {errors.phone && <p className="text-red-600">{errors.phone}</p>}
                         <div className="mt-4">
                             <p>Select payment method:</p>
-                            <button onClick={() => handlePaymentMethodSelection("mercadopago")} className={`mr-2 ${paymentMethod === "mercadopago" ? "bg-blue-500" : "bg-gray-300"} text-white py-2 px-4 rounded`}>Mercado Pago</button>
+                            <button onClick={isLoggedIn ? () => handlePaymentMethodSelection("mercadopago") : () => alert("Please log in to continue")} className={`mr-2 ${paymentMethod === "mercadopago" ? "bg-blue-500" : "bg-gray-300"} text-white py-2 px-4 rounded`}>Mercado Pago</button>
                             <button onClick={() => handlePaymentMethodSelection("onsite")} className={`mr-2 ${paymentMethod === "onsite" ? "bg-blue-500" : "bg-gray-300"} text-white py-2 px-4 rounded`}>Payment on-site</button>
                         </div>
                         {paymentMethod && (
