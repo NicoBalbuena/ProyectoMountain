@@ -19,7 +19,7 @@ authRouter.get('/login/google/callback', passport.authenticate('google', { failu
 // Ruta de registro con Google
 authRouter.post('/register/google', async (req, res) => {
     const { nameGoogle, emailGoogle, accessToken } = req.body;
-console.log('Body:', req.body);
+    console.log('Body: ', req.body);
     try {
         // Verificar si el usuario ya existe en la base de datos
         let user = await User.findOne({ email: emailGoogle });
@@ -53,7 +53,7 @@ console.log('Body:', req.body);
                 id: user._id,
                 name: user.name,
                 email: user.email,
-                accessToken: accessToken, // Asegúrate de enviar el accessToken en la respuesta
+                accessToken: accessToken,
             });
         });
     } catch (error) {
