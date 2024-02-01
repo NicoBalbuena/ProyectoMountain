@@ -9,16 +9,17 @@ const createReview = async (req, res) => {
     const { data } = req.body;
     const { placeId } = req.params;
     const { rating, reviewText } = data;
-    console.log(data)
-    console.log(token)
+    console.log("rating: ", rating);
+    console.log("reviewText: ", reviewText);
     try {
-        
+
         // Verificar el token y obtener el ID del usuario
         jwt.verify(token, jwtSecret, {}, async (err, userData) => {
             if (err) {
                 console.error("Error al verificar el token:", err);
                 throw err;
             }
+            console.log("userData: ", userData);
 
             // Crear la revisión
             const reviewDoc = await Review.create({
@@ -28,12 +29,12 @@ const createReview = async (req, res) => {
                 reviewText,
             });
 
-            console.log("userData:", userData);
+            console.log("reviewDoc: ", reviewDoc);
+
 
             // Asociar la revisión al lugar
             const place = await Place.findById(placeId);
             place.reviews.push(reviewDoc._id);
-            
             // Guardar el lugar con la nueva revisión
             await place.save();
 
