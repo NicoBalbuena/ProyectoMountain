@@ -3,7 +3,6 @@ import AccountNav from "../components/AccountNav";
 import axios from "axios";
 import PlaceImg from "../components/PlaceImg";
 import { differenceInCalendarDays, format } from "date-fns";
-// eslint-disable-next-line no-unused-vars
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2"
 
@@ -24,10 +23,21 @@ const BookingsPage = () => {
             })
     }, []);
 
-const handleSubmit = async (event, review, rating) => {
-    event.preventDefault();
-    setIsSubmitting(true);
-    setSubmitError(null);
+    const handleSubmit = async (event, reviewText, rating) => {
+        event.preventDefault();
+        setIsSubmitting(true);
+        setSubmitError(null);
+        console.log(event)
+        console.log(reviewText)
+        console.log(rating)
+        
+        try {
+            const response = await axios.post(`http://localhost:4000/places/${placeId}/reviews`, {
+                data: {
+                    reviewText,
+                    rating,
+                }
+            },{ withCredentials: true });
 
     try {
         const response = await axios.post(`http://localhost:4000/places/${placeId}/reviews`, {
@@ -121,7 +131,7 @@ const handleSubmit = async (event, review, rating) => {
             <AccountNav />
             <div className="mx-5">
                 {bookings?.length > 0 && bookings.map((booking, index) => (
-                    <div key={booking._id} className="flex gap-4 shadow shadow-black rounded-2xl overflow-hidden mt-3">
+                    <Link to={`/account/bookings/${booking._id}`}  key={booking._id} className="flex gap-4 shadow shadow-black rounded-2xl overflow-hidden mt-3">
                         <div className="w-48">
                             <PlaceImg place={booking.place} />
                         </div>
@@ -205,7 +215,7 @@ const handleSubmit = async (event, review, rating) => {
                                 Cancel booking
                             </button>
                         </div>
-                    </div>
+                    </Link>
                 ))}
             </div>
             {submitError && <p className="mt-2 text-sm text-red-600">{submitError}</p>}

@@ -379,7 +379,7 @@ const PlacesFormPage = () => {
               value={input.guests}
               onChange={handleChange}
             />
-          {errors.guests && <p className="text-red-600">{errors.guests}</p>}
+            {errors.guests && <p className="text-red-600">{errors.guests}</p>}
           </div>
           <div>
             <h3 className="mt-2 -mb-1 text-center">Price per night</h3>
@@ -389,7 +389,7 @@ const PlacesFormPage = () => {
               value={input.price}
               onChange={handleChange}
             />
-          {errors.price && <p className="text-red-600">{errors.price}</p>}
+            {errors.price && <p className="text-red-600">{errors.price}</p>}
           </div>
         </div>
 
