@@ -5,6 +5,7 @@ import { UserContext } from "../components/UserContext";
 import { useNavigate } from 'react-router-dom';
 import { gapi } from "gapi-script";
 import GoogleLogin from 'react-google-login';
+import Swal from "sweetalert2"
 
 const LoginPage = () => {
     
@@ -38,14 +39,25 @@ const LoginPage = () => {
                 { withCredentials: true }
             );
             setUser(data);
-            alert("Login successful");
-            if(data.email==="admin@admin.com"){
-                navigate("/dashboard/main")
-            }
-            setRedirect(true);
+    
+            // Reemplaza el alert por SweetAlert2
+            Swal.fire({
+                title: "¡Welcome to Mountain Haven!",
+                text: "¡Successful login!",
+                icon: "success",
+            }).then(() => {
+                if (data.email === "admin@admin.com") {
+                    navigate("/dashboard/main");
+                }
+                setRedirect(true);
+            });
         } catch (error) {
-            console.log(error)
-            alert(error.response.data);
+            // Reemplaza el alert por SweetAlert2
+            Swal.fire({
+                title: "Error",
+                text: error.response ? error.response.data : "Login failed. Please try again.",
+                icon: "error",
+            });
         }
     };
 
@@ -64,10 +76,19 @@ const LoginPage = () => {
                 { withCredentials: true }
             );
             setUser(data);
-            alert("Login successful");
-            setRedirect(true);
+            Swal.fire({
+                title: "¡Welcome to Mountain Haven!",
+                text: "¡Successful login!",
+                icon: "success",
+            }).then(() => {
+                setRedirect(true);
+            });
         } catch (error) {
-            alert("Login failed");
+            Swal.fire({
+                title: "Error",
+                text: error.response ? error.response.data : "Login failed. Please try again.",
+                icon: "error",
+            });
         }
     };
 
