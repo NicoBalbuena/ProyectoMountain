@@ -84,6 +84,7 @@ const IndexPage = () => {
   const handleClearFilters = async () => {
     fetchPlaces(); // Volvemos a obtener los lugares sin ningún filtro
   };
+  console.log(reviews, "los reviews");
 
   return (
     <div className="mb-[20px]">
@@ -95,8 +96,8 @@ const IndexPage = () => {
           <h2 className="font-semibold text-2xl">Filters</h2>
           <div className="flex items-center gap-5 px-10">
             <div className="my-2 flex justify-center gap-2">
-              <button className="border border-black rounded-2xl p-1" onClick={() => filterByAvgRating(5)}>Filter by rating promedio (5 ⭐)</button>
-              <button className="border border-black rounded-2xl p-1" onClick={() => filterByMinGuests(4)}>Filter by cantidad mínima de huéspedes (4 o más)</button>
+              <button className="border border-black rounded-2xl p-1" onClick={() => filterByAvgRating(5)}>Filter by rating average(5 ⭐)</button>
+              <button className="border border-black rounded-2xl p-1" onClick={() => filterByMinGuests(4)}>Filter by minimum number of guests (4 o más)</button>
             </div>
             <div>
               <select className="bg-primary rounded-2xl p-2" onChange={(e) => {
@@ -107,11 +108,11 @@ const IndexPage = () => {
                   handleSort(value);
                 }
               }}>
-                <option className="bg-yellow-200" value="default">Ordenar por</option>
-                <option className="bg-yellow-200" value="price-desc">Precio (Desc)</option>
-                <option className="bg-yellow-200" value="price-asc">Precio (Asc)</option>
-                <option className="bg-yellow-200" value="guests-asc">Huéspedes (Asc)</option>
-                <option className="bg-yellow-200" value="guests-desc">Huéspedes (Desc)</option>
+                <option className="bg-yellow-200" value="default">Sort by</option>
+                <option className="bg-yellow-200" value="price-desc">Price (Desc)</option>
+                <option className="bg-yellow-200" value="price-asc">Price (Asc)</option>
+                <option className="bg-yellow-200" value="guests-asc">Guests (Asc)</option>
+                <option className="bg-yellow-200" value="guests-desc">Guests (Desc)</option>
                 <option className="bg-yellow-200" value="review-asc">Review (Asc)</option>
                 <option className="bg-yellow-200" value="review-desc">Review (Desc)</option>
               </select>
@@ -145,10 +146,6 @@ const IndexPage = () => {
                     <span className="font-bold">${place.price} </span>
                     <p>per night</p>
                   </div>
-                  <div>
-                    <p>Rating</p>
-                    {console.log(place)}
-                  </div>
                 </div>
               </Link>
             ))}
@@ -167,12 +164,23 @@ const IndexPage = () => {
             activeClassName={"pagination__link--active"}
           />
         </div>
-        <div>
-          <h1>Reseñas de nuestros usuarios</h1>
-          {
-            reviews?.map((review, index) => <div key={index}>
-              {review?.reviewText && <h3>{review.reviewText}</h3>}
-            </div>)}
+        <h2 className="font-semibold text-2xl flex my-2 justify-center">Reviews</h2>
+        <div className="grid grid-cols-3">
+          {reviews?.map((review, index) =>
+            <div className="flex gap-2 w-fit mx-auto" key={index}>
+              <div className="flex">
+                {review.reviewText}
+              </div>
+              <strong className="">
+                {review.rating}
+              </strong>
+              {review.rating === 5 && (<p>⭐⭐⭐⭐⭐</p>)}
+              {review.rating === 4 && (<p>⭐⭐⭐⭐</p>)}
+              {review.rating === 3 && (<p>⭐⭐⭐</p>)}
+              {review.rating === 2 && (<p>⭐⭐</p>)}
+              {review.rating === 1 && (<p>⭐</p>)}
+            </div>
+          )}
         </div>
       </div>
     </div>
