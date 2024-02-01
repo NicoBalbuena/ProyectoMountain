@@ -28,7 +28,7 @@ const BookingsPage = () => {
         event.preventDefault();
         setIsSubmitting(true);
         setSubmitError(null);
-
+    
         try {
             const response = await axios.post(`http://localhost:4000/places/${placeId}/reviews`, {
                 data: {
@@ -36,18 +36,22 @@ const BookingsPage = () => {
                     rating,
                 }
             }, { withCredentials: true });
-
-
-            // Verificar si la solicitud fue exitosa
+    
+            // Check if the request was successful
             if (response.status === 200) {
+                // Show SweetAlert2 success message
+                Swal.fire({
+                    title: "Review submitted successfully!",
+                    icon: "success",
+                });
                 setSubmitSuccess(true);
             } else {
-                setSubmitError("Error al enviar la revisión. Por favor, inténtalo de nuevo más tarde.");
+                setSubmitError("Error submitting the review. Please try again later.");
             }
         } catch (error) {
-            // Manejar errores de la solicitud
-            console.error("Error al enviar la revisión:", error);
-            setSubmitError("Error al enviar la revisión. Por favor, inténtalo de nuevo más tarde.");
+            // Handle request errors
+            console.error("Error submitting the review:", error);
+            setSubmitError("Error submitting the review. Please try again later.");
         } finally {
             setIsSubmitting(false);
         }
@@ -199,16 +203,12 @@ const BookingsPage = () => {
                                 onClick={() => handleCancelReservation(booking._id)}
                                 className="w-full flex justify-center py-2 px-4 border border-red-500 rounded-md shadow-sm text-sm font-medium text-red-500 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                             >
-                                Cancelar Reserva
+                                Cancel booking
                             </button>
                         </div>
                     </div>
                 ))}
             </div>
-            {submitError && <p className="mt-2 text-sm text-red-600">{submitError}</p>}
-            {submitSuccess && (
-                <p className="mt-2 text-sm text-green-600">¡Revisión enviada con éxito!</p>
-            )}
         </div>
     );
 };
