@@ -3,6 +3,7 @@ import AccountNav from "../components/AccountNav";
 import axios from "axios";
 import PlaceImg from "../components/PlaceImg";
 import { differenceInCalendarDays, format } from "date-fns";
+// eslint-disable-next-line no-unused-vars
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2"
 
@@ -23,49 +24,35 @@ const BookingsPage = () => {
             })
     }, []);
 
-    const handleSubmit = async (event, reviewText, rating) => {
+    const handleSubmit = async (event, review, rating) => {
         event.preventDefault();
         setIsSubmitting(true);
         setSubmitError(null);
-        console.log(event)
-        console.log(reviewText)
-        console.log(rating)
-        
+
         try {
             const response = await axios.post(`http://localhost:4000/places/${placeId}/reviews`, {
                 data: {
-                    reviewText,
+                    review,
                     rating,
                 }
-            },{ withCredentials: true });
+            }, { withCredentials: true });
 
-    try {
-        const response = await axios.post(`http://localhost:4000/places/${placeId}/reviews`, {
-            data: {
-                review,
-                rating,
+
+            // Verificar si la solicitud fue exitosa
+            if (response.status === 200) {
+                setSubmitSuccess(true);
+            } else {
+                setSubmitError("Error al enviar la revisión. Por favor, inténtalo de nuevo más tarde.");
             }
-        }, { withCredentials: true });
-
-        // Check if the request was successful
-        if (response.status === 200) {
-            // Show SweetAlert2 success message
-            Swal.fire({
-                title: "Review submitted successfully!",
-                icon: "success",
-            });
-            setSubmitSuccess(true);
-        } else {
-            setSubmitError("Error submitting the review. Please try again later.");
+        } catch (error) {
+            // Manejar errores de la solicitud
+            console.error("Error al enviar la revisión:", error);
+            setSubmitError("Error al enviar la revisión. Por favor, inténtalo de nuevo más tarde.");
+        } finally {
+            setIsSubmitting(false);
         }
-    } catch (error) {
-        // Handle request errors
-        console.error("Error submitting the review:", error);
-        setSubmitError("Error submitting the review. Please try again later.");
-    } finally {
-        setIsSubmitting(false);
-    }
-};
+    };
+
 
     const handleReviewChange = (event, bookingId) => {
         const { value } = event.target;
@@ -131,7 +118,7 @@ const BookingsPage = () => {
             <AccountNav />
             <div className="mx-5">
                 {bookings?.length > 0 && bookings.map((booking, index) => (
-                    <Link to={`/account/bookings/${booking._id}`}  key={booking._id} className="flex gap-4 shadow shadow-black rounded-2xl overflow-hidden mt-3">
+                    <div key={booking._id} className="flex gap-4 shadow shadow-black rounded-2xl overflow-hidden mt-3">
                         <div className="w-48">
                             <PlaceImg place={booking.place} />
                         </div>
@@ -212,10 +199,10 @@ const BookingsPage = () => {
                                 onClick={() => handleCancelReservation(booking._id)}
                                 className="w-full flex justify-center py-2 px-4 border border-red-500 rounded-md shadow-sm text-sm font-medium text-red-500 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                             >
-                                Cancel booking
+                                Cancelar Reserva
                             </button>
                         </div>
-                    </Link>
+                    </div>
                 ))}
             </div>
             {submitError && <p className="mt-2 text-sm text-red-600">{submitError}</p>}
