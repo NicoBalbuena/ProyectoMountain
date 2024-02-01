@@ -9,7 +9,7 @@ const IndexPage = () => {
   const [places, setPlaces] = useState([]);
   const [sortedPlaces, setSortedPlaces] = useState([]);
   const [pageNumber, setPageNumber] = useState(0);
-  const placesPerPage = 4;
+  const placesPerPage = 10;
   const pagesVisited = pageNumber * placesPerPage;
   const [reviews, setReviews] = useState([]);
 
@@ -127,7 +127,7 @@ const IndexPage = () => {
             </button>
           </div>
         </div>
-        <div className="mt-8 grid gap-x-12 gap-y-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="mt-8 grid gap-x-12 gap-y-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           {(sortedPlaces.length > 0 ? sortedPlaces : places)
             .slice(pagesVisited, pagesVisited + placesPerPage)
             .map((place) => (

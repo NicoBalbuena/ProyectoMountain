@@ -118,7 +118,7 @@ const BookingsPage = () => {
     
 
     return (
-        <div className="mb-[150px]">
+        <div className="mb-[15px]">
             <AccountNav />
             <div className="mx-5">
                 {bookings?.length > 0 && bookings.map((booking, index) => (
