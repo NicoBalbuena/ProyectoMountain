@@ -16,10 +16,10 @@ const PlacePage = () => {
         axios.get(`http://localhost:4000/places/${id}`)
             .then(res => {
                 setPlace(res.data)
-                
+
             })
     }, [id])
-    
+
     if (!place) return "";
 
     if (showAllPhotos) {
@@ -47,8 +47,10 @@ const PlacePage = () => {
         )
     }
 
+    console.log(place, "kaosi");
+
     return (
-        <div className="mt-4 px-8 mx-5 mb-[150px]">
+        <div className="mt-4 px-8 mx-5">
             <h1 className="text-3xl">{place.title}</h1>
             <a className="flex gap-1 my-3 font-semibold underline" rel="noopener noreferrer" target="_blank" href={`https://maps.google.com/?q=${place.address}`}>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -174,20 +176,37 @@ const PlacePage = () => {
                     <BookingWidget place={place} />
                 </div>
             </div>
-            {place.extraInfo && (
-                <div>
-                    <div className="bg-white -mx-8 px-8 py-8 border-t">
-                        <div>
-                            <h2 className="font-semibold text-2xl">Extra info</h2>
+            <div className="grid grid-cols-2 border-t gap-10 pt-3 pb-4">
+                {place.extraInfo && (
+                    <div className="border-r pr-5 ">
+                        <div className="">
+                            <div>
+                                <h2 className="font-semibold text-2xl">Extra info</h2>
+                            </div>
+                            <div className="mt-3 text-sm text-gray-700 leading-5">{place.extraInfo}</div>
                         </div>
-                        <div className="mb-4 mt-2 text-sm text-gray-700 leading-5">{place.extraInfo}</div>
+                    </div>
+                )}
+                <div>
+                    <div>
+                        <h2 className="font-semibold text-2xl">Reviews</h2>
+                    </div>
+                    <div className="flex flex-col mt-2">
+                        {place?.reviews.map((review, index) =>
+                            <div className="flex gap-2 text-sm text-gray-700 leading-5" key={index}>
+                                <strong className="flex gap-1 w-32">
+                                    {review.rating}
+                                    {review.rating === 5 && (<p>⭐⭐⭐⭐⭐</p>)}
+                                    {review.rating === 4 && (<p>⭐⭐⭐⭐</p>)}
+                                    {review.rating === 3 && (<p>⭐⭐⭐</p>)}
+                                    {review.rating === 2 && (<p>⭐⭐</p>)}
+                                    {review.rating === 1 && (<p>⭐</p>)}
+                                </strong>
+                                <p className="">{review.reviewText}</p>
+                            </div>
+                        )}
                     </div>
                 </div>
-            )}
-            <div>
-                {console.log(place)}
-                <h1>Reviews</h1>
-                {place.reviews.map((review, index) => <div key={index}><p>{review.reviewText}</p><p>{review.rating}</p></div>)}
             </div>
         </div>
 

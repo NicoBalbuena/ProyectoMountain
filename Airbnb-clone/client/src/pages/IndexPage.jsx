@@ -92,12 +92,11 @@ const IndexPage = () => {
       </div>
       <div className="mx-6 ">
         <div className="mt-2 flex flex-col items-center" >
-        <h2 className="font-semibold text-2xl">Filters</h2>
+          <h2 className="font-semibold text-2xl">Filters</h2>
           <div className="flex items-center gap-5 px-10">
             <div className="my-2 flex justify-center gap-2">
               <button className="border border-black rounded-2xl p-1" onClick={() => filterByAvgRating(5)}>Filter by rating promedio (5 ⭐)</button>
               <button className="border border-black rounded-2xl p-1" onClick={() => filterByMinGuests(4)}>Filter by cantidad mínima de huéspedes (4 o más)</button>
-              <button className="border border-black rounded-2xl p-1" onClick={() => filterByAvailability("2024-02-01", "2024-02-07")}>Filtrar por disponibilidad </button>
             </div>
             <div>
               <select className="bg-primary rounded-2xl p-2" onChange={(e) => {
@@ -143,13 +142,13 @@ const IndexPage = () => {
                     <h3 className="text-sm truncate text-gray-500">{place.title}</h3>
                   </div>
                   <div className="mt-1 flex gap-1">
-                    <span className="font-bold">${place.price} </span> 
+                    <span className="font-bold">${place.price} </span>
                     <p>per night</p>
                   </div>
                   <div>
                     <p>Rating</p>
                     {console.log(place)}
-                    </div>
+                  </div>
                 </div>
               </Link>
             ))}
@@ -170,10 +169,10 @@ const IndexPage = () => {
         </div>
         <div>
           <h1>Reseñas de nuestros usuarios</h1>
-          { 
-          reviews?.map((review, index)=> <div key={index}>
+          {
+            reviews?.map((review, index) => <div key={index}>
               {review?.reviewText && <h3>{review.reviewText}</h3>}
-          </div>)}
+            </div>)}
         </div>
       </div>
     </div>
