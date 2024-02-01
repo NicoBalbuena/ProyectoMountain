@@ -18,7 +18,7 @@ const PlacesPage = () => {
     }, [])
     
     return (
-        <div className="mb-[150px]">
+        <div className="mb-[15px]">
             
             <AccountNav />
             

@@ -9,7 +9,7 @@ const IndexPage = () => {
   const [places, setPlaces] = useState([]);
   const [sortedPlaces, setSortedPlaces] = useState([]);
   const [pageNumber, setPageNumber] = useState(0);
-  const placesPerPage = 4;
+  const placesPerPage = 10;
   const pagesVisited = pageNumber * placesPerPage;
   const [reviews, setReviews] = useState([]);
 
@@ -84,6 +84,7 @@ const IndexPage = () => {
   const handleClearFilters = async () => {
     fetchPlaces(); // Volvemos a obtener los lugares sin ningún filtro
   };
+  console.log(reviews, "los reviews");
 
   return (
     <div className="mb-[20px]">
@@ -92,12 +93,11 @@ const IndexPage = () => {
       </div>
       <div className="mx-6 ">
         <div className="mt-2 flex flex-col items-center" >
-        <h2 className="font-semibold text-2xl">Filters</h2>
+          <h2 className="font-semibold text-2xl">Filters</h2>
           <div className="flex items-center gap-5 px-10">
             <div className="my-2 flex justify-center gap-2">
               <button className="border border-black rounded-2xl p-1" onClick={() => filterByAvgRating(5)}>Filter by rating average(5 ⭐)</button>
               <button className="border border-black rounded-2xl p-1" onClick={() => filterByMinGuests(4)}>Filter by minimum number of guests (4 o más)</button>
-              <button className="border border-black rounded-2xl p-1" onClick={() => filterByAvailability("2024-02-01", "2024-02-07")}>Filter by availability </button>
             </div>
             <div>
               <select className="bg-primary rounded-2xl p-2" onChange={(e) => {
@@ -127,7 +127,7 @@ const IndexPage = () => {
             </button>
           </div>
         </div>
-        <div className="mt-8 grid gap-x-12 gap-y-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="mt-8 grid gap-x-12 gap-y-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           {(sortedPlaces.length > 0 ? sortedPlaces : places)
             .slice(pagesVisited, pagesVisited + placesPerPage)
             .map((place) => (
@@ -143,13 +143,9 @@ const IndexPage = () => {
                     <h3 className="text-sm truncate text-gray-500">{place.title}</h3>
                   </div>
                   <div className="mt-1 flex gap-1">
-                    <span className="font-bold">${place.price} </span> 
+                    <span className="font-bold">${place.price} </span>
                     <p>per night</p>
                   </div>
-                  <div>
-                    <p>Rating</p>
-                    {console.log(place)}
-                    </div>
                 </div>
               </Link>
             ))}
@@ -168,12 +164,23 @@ const IndexPage = () => {
             activeClassName={"pagination__link--active"}
           />
         </div>
-        <div>
-          <h1>Reseñas de nuestros usuarios</h1>
-          { 
-          reviews?.map((review, index)=> <div key={index}>
-              {review?.reviewText && <h3>{review.reviewText}</h3>}
-          </div>)}
+        <h2 className="font-semibold text-2xl flex my-2 justify-center">Reviews</h2>
+        <div className="grid grid-cols-3">
+          {reviews?.map((review, index) =>
+            <div className="flex gap-2 w-fit mx-auto" key={index}>
+              <div className="flex">
+                {review.reviewText}
+              </div>
+              <strong className="">
+                {review.rating}
+              </strong>
+              {review.rating === 5 && (<p>⭐⭐⭐⭐⭐</p>)}
+              {review.rating === 4 && (<p>⭐⭐⭐⭐</p>)}
+              {review.rating === 3 && (<p>⭐⭐⭐</p>)}
+              {review.rating === 2 && (<p>⭐⭐</p>)}
+              {review.rating === 1 && (<p>⭐</p>)}
+            </div>
+          )}
         </div>
       </div>
     </div>

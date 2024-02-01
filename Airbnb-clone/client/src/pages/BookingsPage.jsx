@@ -118,14 +118,14 @@ const BookingsPage = () => {
     
 
     return (
-        <div className="mb-[150px]">
+        <div className="mb-[15px]">
             <AccountNav />
             <div className="mx-5">
                 {bookings?.length > 0 && bookings.map((booking, index) => (
                     <div key={booking._id} className="flex gap-4 shadow shadow-black rounded-2xl overflow-hidden mt-3">
-                        <div className="w-48">
+                        <Link  to={`/account/bookings/${booking._id}`} className="w-48">
                             <PlaceImg place={booking.place} />
-                        </div>
+                        </Link>
                         <div className="py-3 pr-3 grow ">
                             <h2 className="text-xl">{booking.place.title}</h2>
                             <div className="flex gap-2 items-center border-t border-gray-300 mt-2 py-2">
