@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios"
+import Swal from "sweetalert2";
 
 const RegisterPage = () => {
 
@@ -21,20 +22,29 @@ const RegisterPage = () => {
     }
 
     const registerUser = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
         try {
             await axios.post("http://localhost:4000/register", {
                 name,
                 email,
                 password
-            }, { withCredentials: true })
-            alert("Registration successful. Now you can log in")
+            }, { withCredentials: true });
+    
+            // Reemplaza el alert por SweetAlert2
+            Swal.fire({
+                title: "Successful registration!",
+                text: "Now you can log in.",
+                icon: "success",
+            });
         } catch (error) {
-            console.log(error)
-            alert("Registration failed. Please try again later")
+            // Reemplaza el alert por SweetAlert2
+            Swal.fire({
+                title: "Error",
+                text: "Registration has failed. Please try again later.",
+                icon: "error",
+            });
         }
-
-    }
+    };
 
     return (
         <div className="mt-4 grow flex items-center justify-around">

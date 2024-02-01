@@ -5,6 +5,7 @@ import PlaceImg from "../components/PlaceImg";
 import { differenceInCalendarDays, format } from "date-fns";
 // eslint-disable-next-line no-unused-vars
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2"
 
 const BookingsPage = () => {
     const [bookings, setBookings] = useState([]);
@@ -23,36 +24,39 @@ const BookingsPage = () => {
             })
     }, []);
 
-    const handleSubmit = async (event, review, rating) => {
-        event.preventDefault();
-        setIsSubmitting(true);
-        setSubmitError(null);
-        
-        try {
-            const response = await axios.post(`http://localhost:4000/places/${placeId}/reviews`, {
-                data: {
-                    review,
-                    rating,
-                }
-            },{ withCredentials: true });
+const handleSubmit = async (event, review, rating) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+    setSubmitError(null);
 
-        
-            // Verificar si la solicitud fue exitosa
-            if (response.status === 200) {
-                setSubmitSuccess(true);
-            } else {
-                setSubmitError("Error al enviar la revisión. Por favor, inténtalo de nuevo más tarde.");
+    try {
+        const response = await axios.post(`http://localhost:4000/places/${placeId}/reviews`, {
+            data: {
+                review,
+                rating,
             }
-        } catch (error) {
-            // Manejar errores de la solicitud
-            console.error("Error al enviar la revisión:", error);
-            setSubmitError("Error al enviar la revisión. Por favor, inténtalo de nuevo más tarde.");
-        } finally {
-            setIsSubmitting(false);
+        }, { withCredentials: true });
+
+        // Check if the request was successful
+        if (response.status === 200) {
+            // Show SweetAlert2 success message
+            Swal.fire({
+                title: "Review submitted successfully!",
+                icon: "success",
+            });
+            setSubmitSuccess(true);
+        } else {
+            setSubmitError("Error submitting the review. Please try again later.");
         }
-    };
-    
-    
+    } catch (error) {
+        // Handle request errors
+        console.error("Error submitting the review:", error);
+        setSubmitError("Error submitting the review. Please try again later.");
+    } finally {
+        setIsSubmitting(false);
+    }
+};
+
     const handleReviewChange = (event, bookingId) => {
         const { value } = event.target;
         setReviews(prevReviews => ({
@@ -74,6 +78,43 @@ const BookingsPage = () => {
             }
         }));
     };
+
+    const handleCancelReservation = async (bookingId) => {
+        try {
+            // Lógica para cancelar la reserva utilizando axios.delete u otro método
+            await axios.delete(`http://localhost:4000/bookings/${bookingId}`, { withCredentials: true });
+            // Actualizar la lista de reservas después de la cancelación
+            setBookings((prevBookings) => prevBookings.filter((booking) => booking._id !== bookingId));
+            
+            // Mostrar el mensaje de éxito con SweetAlert2
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, I want to cancel my reservation."
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  Swal.fire({
+                    title: "Ready!",
+                    text: "Your reservation has been successfully canceled!",
+                    icon: "success"
+                  });
+                }
+              });
+        } catch (error) {
+            console.error("Error canceling reservation", error);
+            // Manejo de errores
+            Swal.fire({
+                title: "Error",
+                text: "There was an error canceling the reservation. Please try again later.",
+                icon: "error"
+            });
+        }
+    };
+    
 
     return (
         <div className="mb-[150px]">
@@ -118,7 +159,7 @@ const BookingsPage = () => {
                             <form onSubmit={(event) => handleSubmit(event, reviews[booking._id]?.review, reviews[booking._id]?.rating)} className="mt-4">
 
                                 <label htmlFor={`review-${booking._id}`} className="block text-lg font-medium text-gray-700">
-                                    ¿Ya visitaste este sitio? ¡Califícalo!
+                                Have you already visited this site? Rate it!
                                 </label>
                                 <textarea
                                     id={`review-${booking._id}`}
@@ -127,7 +168,7 @@ const BookingsPage = () => {
                                     rows={4}
                                     maxLength={300}
                                     className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                    placeholder="Escribe tu reseña aquí (máximo 300 caracteres)"
+                                    placeholder="Write your review here (maximum 300 characters)"
                                     required
                                 />
                                 <div className="mt-3">
@@ -139,7 +180,7 @@ const BookingsPage = () => {
                                         className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                         required
                                     >
-                                        <option value="">Seleccione una opción</option>
+                                        <option value="">Select an option</option>
                                         <option value="1">1</option>
                                         <option value="2">2</option>
                                         <option value="3">3</option>
@@ -153,10 +194,16 @@ const BookingsPage = () => {
                                         className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                         disabled={isSubmitting || submitSuccess}
                                     >
-                                        Enviar revisión
+                                        Submit review!
                                     </button>
                                 </div>
                             </form>
+                            <button
+                                onClick={() => handleCancelReservation(booking._id)}
+                                className="w-full flex justify-center py-2 px-4 border border-red-500 rounded-md shadow-sm text-sm font-medium text-red-500 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                            >
+                                Cancel booking
+                            </button>
                         </div>
                     </div>
                 ))}
