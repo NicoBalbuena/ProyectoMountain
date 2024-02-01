@@ -11,6 +11,7 @@ const IndexPage = () => {
   const [pageNumber, setPageNumber] = useState(0);
   const placesPerPage = 4;
   const pagesVisited = pageNumber * placesPerPage;
+  const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
     fetchPlaces(); // Llamamos a la función para obtener los lugares cuando el componente se monta
@@ -19,7 +20,9 @@ const IndexPage = () => {
   const fetchPlaces = async () => {
     try {
       const response = await axios.get("http://localhost:4000/placesAll/");
-      setPlaces(response.data.filter((place) => !place.deleted)); // Actualizamos el estado con los lugares obtenidos
+      setPlaces(response.data.filter((place) => !place.deleted));
+      const reviewsAll = await axios.get("http://localhost:4000/reviews/");
+      setReviews(reviewsAll.data.reviews); // Actualizamos el estado con los lugares obtenidos
     } catch (error) {
       console.error("Error al obtener los lugares:", error);
     }
@@ -83,7 +86,7 @@ const IndexPage = () => {
   };
 
   return (
-    <div className="mb-[150px]">
+    <div className="mb-[20px]">
       <div>
         <Banner />
       </div>
@@ -134,14 +137,19 @@ const IndexPage = () => {
                     <img className="rounded-2xl object-cover aspect-square w-full" src={place.photos?.[0]} alt="" />
                   )}
                 </div>
-                <div className="flex justify-between">
-                  <div>
+                <div className="flex flex-col">
+                  <div className="flex flex-col">
                     <h2 className="font-bold">{place.address}</h2>
                     <h3 className="text-sm truncate text-gray-500">{place.title}</h3>
                   </div>
-                  <div className="mt-1">
-                    <span className="font-bold">${place.price}</span> per night
+                  <div className="mt-1 flex gap-1">
+                    <span className="font-bold">${place.price} </span> 
+                    <p>per night</p>
                   </div>
+                  <div>
+                    <p>Rating</p>
+                    {console.log(place)}
+                    </div>
                 </div>
               </Link>
             ))}
@@ -159,6 +167,13 @@ const IndexPage = () => {
             disabledClassName={"pagination__link--disabled"}
             activeClassName={"pagination__link--active"}
           />
+        </div>
+        <div>
+          <h1>Reseñas de nuestros usuarios</h1>
+          { 
+          reviews?.map((review, index)=> <div key={index}>
+              {review?.reviewText && <h3>{review.reviewText}</h3>}
+          </div>)}
         </div>
       </div>
     </div>

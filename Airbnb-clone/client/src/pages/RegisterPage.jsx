@@ -41,7 +41,7 @@ const RegisterPage = () => {
             <div className="mb-64">
                 <h1 className="text-4xl text-center mb-4">Register</h1>
                 <form className="max-w-md mx-auto" onSubmit={registerUser}>
-                    <input type="text" placeholder="UserName" value={name} onChange={changeName} />
+                    <input type="text" placeholder="Username" value={name} onChange={changeName} />
                     <input type="email" placeholder="your@gmail.com" value={email} onChange={changeEmail} />
                     <input type="password" placeholder="password" value={password} onChange={changePassword} />
                     <button className="primary">Register</button>
