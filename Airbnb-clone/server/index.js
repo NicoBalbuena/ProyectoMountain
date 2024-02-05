@@ -21,6 +21,7 @@ const jwtSecret = "ksdojodksokdmc3";
 const authRouter = require("./auth-routes");
 const reviewController = require("./review-controller");
 const { registerAndEmail } = require("../server/email-controller");
+const { deletePlace, deleteUser, deleteBooking, deleteReview } = require("./deleteController.js");
 const cloudinary = require("./middleware/cloudinary-middleware");
 const nodemailer = require("nodemailer");
 const filtros = require("./filtros");
@@ -54,6 +55,13 @@ app.use(
     optionsSuccessStatus: 204,
   })
 );
+
+// Borrado lógico
+
+app.patch("/places/:id", deletePlace);
+app.delete("/bookings/:id", deleteBooking);
+app.delete("/places/:placeId/reviews", deleteReview);
+app.patch("/users/:id", deleteUser);
 
 // Manejo de errores de conexión a MongoDB
 
@@ -153,6 +161,9 @@ app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   const userDoc = await User.findOne({ email });
   if (userDoc) {
+    if(userDoc.deleted){
+      res.status(450).json("DESHABILITADO");
+    }
     const passOk = bcrypt.compareSync(password, userDoc.password);
     if (passOk) {
       jwt.sign(
@@ -259,6 +270,9 @@ app.get("/places/sort-by-guests-desc", async (req, res) => {
   }
 });
 
+//ruta para obtener todos las reviews
+app.get("/reviews", reviewController.getReviewsAll);
+
 app.post("/places/:placeId/reviews", reviewController.createReview);
 app.get("/places/:placeId/reviews", reviewController.getReviewsByPlace);
 // Rutas para obtener lugares ordenados por valor de revisión asc y desc
@@ -266,13 +280,9 @@ app.get("/places/:placeId/reviews", reviewController.getReviewsByPlace);
 //Rutas para filtros
 app.get("/places/by-avg-rating/:avgRating", filtros.getPlacesByAvgRating);
 app.get("/places/min-guests/:minGuests", filtros.getPlacesByGuests);
-app.get("/places/available/:checkIn/:checkOut", filtros.getAvailablePlaces);
 app.get("/places/filter", filtros.getFilteredPlaces)
 
-app.get(
-  "/places/sort-by-review-desc",
-  reviewController.getPlacesSortedByReviewDesc
-);
+app.get("/places/sort-by-review-desc",reviewController.getPlacesSortedByReviewDesc);
 
 //uploads
 const photosMiddleware = multer({ dest: "uploads/" });
@@ -308,8 +318,7 @@ app.post("/places", cloudinary, (req, res) => {
     description,
     perks,
     extraInfo,
-    checkIn,
-    checkOut,
+    type,
     guests,
     price,
   } = data;
@@ -324,8 +333,7 @@ app.post("/places", cloudinary, (req, res) => {
       description,
       perks,
       extraInfo,
-      checkIn,
-      checkOut,
+      type,
       guests,
       price,
     });
@@ -378,8 +386,7 @@ app.put("/places", async (req, res) => {
     description,
     perks,
     extraInfo,
-    checkIn,
-    checkOut,
+    type,
     guests,
     price,
   } = data;
@@ -395,8 +402,7 @@ app.put("/places", async (req, res) => {
         description,
         perks,
         extraInfo,
-        checkIn,
-        checkOut,
+        type,
         guests,
         price,
       });
@@ -407,7 +413,23 @@ app.put("/places", async (req, res) => {
 });
 
 app.get("/places", async (req, res) => {
-  res.json(await Place.find());
+  try {
+      const places = await Place.find({deleted: false});
+      res.json(places);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.get("/placesAll", async (req, res) => {
+  try {
+      const places = await Place.find();
+      res.json(places);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 app.post("/bookings", async (req, res) => {
@@ -451,6 +473,41 @@ app.post("/bookings", async (req, res) => {
   }
 });
 
+app.get("/users", async (req, res) => {
+  try {
+    const users = await User.find();
+    
+    return res.status(200).json(users);
+  } catch (error) {
+    console.error("Error getting users", error)
+    return res.status(500).json({message: "Error getting users"})
+  }
+})
+
+app.get("/users/:id", async (req,res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    if(!user) return res.status(404).json({message: "User not found"});
+
+    return res.status(200).json(user);
+  } catch (error) {
+    console.error("Error gettting user by id", error);
+    res.status(500).json({message: "Internal Server Error"});
+  }
+})
+
+app.get("/usersAll", async (req, res) => {
+  try {
+    const users = await User.find();
+    return res.status(200).json(users);
+  } catch (error) {
+    console.error("Error getting users", error)
+    return res.status(500).json({message: "Error getting users"})
+  }
+})
+
+
 app.get("/bookings", async (req, res) => {
   const { token } = req.cookies;
 
@@ -471,7 +528,7 @@ app.get("/bookings", async (req, res) => {
     const { id } = userData;
 
     try {
-      const bookings = await Booking.find({ user: id }).populate("place");
+      const bookings = await Booking.find({ user: id, deleted: false }).populate("place");
       res.json(bookings);
     } catch (error) {
       console.error("Error fetching bookings:", error);

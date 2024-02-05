@@ -38,7 +38,7 @@ const AccountPage = () => {
 
   return (
     <div>
-      <AccountNav />
+      <AccountNav isAdmin={user.email === "admin@admin.com"}/>
 
       {subpage === "profile" && (
         <div className="text-center max-w-lg mx-auto">

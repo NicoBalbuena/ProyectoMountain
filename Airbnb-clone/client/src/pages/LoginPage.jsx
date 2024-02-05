@@ -5,6 +5,7 @@ import { UserContext } from "../components/UserContext";
 import { useNavigate } from 'react-router-dom';
 import { gapi } from "gapi-script";
 import GoogleLogin from 'react-google-login';
+import Swal from "sweetalert2"
 
 const LoginPage = () => {
     
@@ -38,29 +39,56 @@ const LoginPage = () => {
                 { withCredentials: true }
             );
             setUser(data);
-            alert("Login successful");
-            setRedirect(true);
+    
+            // Reemplaza el alert por SweetAlert2
+            Swal.fire({
+                title: "¡Welcome to Mountain Haven!",
+                text: "¡Successful login!",
+                icon: "success",
+            }).then(() => {
+                if (data.email === "admin@admin.com") {
+                    navigate("/dashboard/main");
+                }
+                setRedirect(true);
+            });
         } catch (error) {
-            alert("Login failed");
+            // Reemplaza el alert por SweetAlert2
+            Swal.fire({
+                title: "Error",
+                text: error.response ? error.response.data : "Login failed. Please try again.",
+                icon: "error",
+            });
         }
     };
 
     const onSuccess = async (response) => {
         setUserGoogle(response.profileObj);
+        const googleAccessToken = response.tokenId || response.accessToken;
+        console.log(googleAccessToken);
         try {
             const { data } = await axios.post(
                 "http://localhost:4000/auth/register/google",
                 {
                     emailGoogle: response.profileObj.email,
                     nameGoogle: response.profileObj.name,
+                    accessToken: googleAccessToken,
                 },
                 { withCredentials: true }
             );
             setUser(data);
-            alert("Login successful");
-            setRedirect(true);
+            Swal.fire({
+                title: "¡Welcome to Mountain Haven!",
+                text: "¡Successful login!",
+                icon: "success",
+            }).then(() => {
+                setRedirect(true);
+            });
         } catch (error) {
-            alert("Login failed");
+            Swal.fire({
+                title: "Error",
+                text: error.response ? error.response.data : "Login failed. Please try again.",
+                icon: "error",
+            });
         }
     };
 
@@ -87,9 +115,10 @@ const LoginPage = () => {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                     <button className="primary">Login</button>
-                    <p>Or</p>
-                    <div>
+                
+                    <div className="mt-5 w-auto flex justify-center">
                         <GoogleLogin
+                            className="flex justify-center w-96"
                             clientId={client_id}
                             onSuccess={onSuccess}
                             onFailure={() => console.log("Google login failed")}

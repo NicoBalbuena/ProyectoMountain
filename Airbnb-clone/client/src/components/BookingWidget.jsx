@@ -1,3 +1,4 @@
+
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react"
 import { differenceInCalendarDays } from "date-fns";
@@ -6,11 +7,13 @@ import axios from "axios";
 import { useContext } from "react";
 import { UserContext } from "./UserContext";
 
+
 const BookingWidget = ({ place }) => {
     // Almacenar el placeId en localStorage
     localStorage.setItem('placeId', place._id);
     console.log("se almacena ok",place._id)
-
+    console.log("se almacena ok",place._id)
+    
     const [checkIn, setCheckIn] = useState("")
     const [checkOut, setCheckOut] = useState("")
     const [numberOfGuests, setNumberOfGuests] = useState(1)
@@ -30,6 +33,7 @@ const BookingWidget = ({ place }) => {
             setName(user.name);
         }
     }, [user]);
+    
     
 
     let numberOfNights = 0
@@ -58,15 +62,22 @@ const BookingWidget = ({ place }) => {
             const bookingId = response.data._id
             setRedirect(`/account/bookings/${bookingId}`)
         }
+        
     }
 
     const handlePaymentMethodSelection = async (method) => {
+        if (!user) {
+            // Si el usuario no está autenticado, mostrar un mensaje o redirigir a la página de inicio de sesión
+            alert("Please log in to continue");
+            return;
+        }
+    
         setPaymentMethod(method);
         if (method === "mercadopago") {
             try {
                 // Calcular el precio total basado en el número de noches seleccionadas y el precio del lugar
                 const totalPrice = numberOfNights * place.price * numberOfGuests;
-
+    
                 const response = await axios.post(
                     `http://localhost:4000/mp/create-order/${place._id}`,
                     {
@@ -100,7 +111,7 @@ const BookingWidget = ({ place }) => {
     console.log(checkIn, checkOut, numberOfGuests);
 
     return (
-        <div className="bg-white shadow p-4 rounded-2xl">
+        <div className="bg-white shadow shadow-black p-4 rounded-2xl">
             <div className="text-2xl text-center">
                 Price: ${place.price} / per night
             </div>

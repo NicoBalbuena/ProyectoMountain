@@ -18,7 +18,7 @@ const PlacesPage = () => {
     }, [])
     
     return (
-        <div className="mb-[150px]">
+        <div className="mb-[15px]">
             
             <AccountNav />
             
@@ -33,8 +33,8 @@ const PlacesPage = () => {
             </div>
             <div className="mt-4">
                 {places.length > 0 && places.map(place => (
-                    <Link key={place._id} to={"/account/places/" + place._id} className="flex gap-4 bg-gray-100 p-4 rounded-2xl cursor-pointer" >
-                        <div className="flex w-32 h-32 bg-gray-300 grow shrink-0">
+                    <Link key={place._id} to={"/account/places/" + place._id} className="flex mx-5 gap-4 shadow shadow-black p-4 rounded-2xl cursor-pointer mt-3" >
+                        <div className="flex w-32 h-32 shrink-0">
                             {place.photos.length > 0 && (
                                 <img className="object-cover" src={place.photos[0]} alt="" />
                             )}

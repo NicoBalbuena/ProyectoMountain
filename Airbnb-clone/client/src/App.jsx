@@ -10,7 +10,11 @@ import PlacesFormPage from "./pages/PlacesFormPage"
 import PlacePage from "./pages/PlacePage"
 import BookingsPage from "./pages/BookingsPage"
 import BookingPage from "./pages/BookingPage"
-import Dashboard from "./pages/DashboardPage"
+import DashboardIndex from "./pages/DashboardPage"
+import { DashboardMain } from "./pages/DashboardMain"
+import { DashboardUsers } from "./pages/DashboardUsers"
+import { DashboardLodgings } from "./pages/DashboardLodgings"
+import About from "./pages/About"
 
 
 function App() {
@@ -29,12 +33,14 @@ function App() {
           <Route path="/place/:id" element={<PlacePage />} />
           <Route path="/account/bookings" element={<BookingsPage />} />
           <Route path="/account/bookings/:id" element={<BookingPage />} />
+          <Route path="/about" element={<About/>} />
         </Route>
       
-          <Route path="/dashboard" element={<Dashboard/>}>
-          <Route path="/dashboard/users" element={<Dashboard/>}/>
-          <Route path="/dashboard/lodgins" element={<Dashboard/>}/>
-          <Route path="/dashboard/owners" element={<Dashboard/>}/>
+          <Route path="/dashboard" element={<DashboardIndex/>}>
+          <Route path="/dashboard/users" element={<DashboardUsers/>}/>
+          <Route path="/dashboard/lodgins" element={<DashboardLodgings/>}/>
+          
+          <Route path="/dashboard/main" element={<DashboardMain/>}/>
           </Route>
       </Routes>
     </UserContextProvider>

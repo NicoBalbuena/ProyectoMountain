@@ -8,12 +8,12 @@ const placeSchema = new mongoose.Schema({
     description: String,
     perks: [String],
     extraInfo: String,
-    checkIn: Number,
-    checkOut: Number,
+    type: String,
     guests: Number,
     price: Number,
     reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
     avgRating: Number,
+    deleted: { type: Boolean, default: false }
 });
 
 // Middleware init para ejecutar código cada vez que se inicializa un documento Place

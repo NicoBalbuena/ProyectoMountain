@@ -4,7 +4,6 @@ import Perks from "../components/Perks";
 import axios from "axios";
 import AccountNav from "../components/AccountNav";
 
-const preset = "ml_default";
 const PlacesFormPage = () => {
   const [redirect, setRedirect] = useState(false);
   const { id } = useParams();
@@ -13,15 +12,24 @@ const PlacesFormPage = () => {
     title: "",
     address: "",
     photos: [],
-    photosLink: "",
     description: "",
     perks: [],
     extraInfo: "",
-    checkIn: "",
-    checkOut: "",
+    type: "",
     guests: 1,
     price: 100,
   });
+
+  const [errors, setErrors] = useState({
+    title: "",
+    address: "",
+    photos: "",
+    description: "",
+    perks: "",
+    type: "",
+    guests: "",
+    price: ""
+  })
 
   useEffect(() => {
     if (!id) {
@@ -34,17 +42,30 @@ const PlacesFormPage = () => {
         title: data.title,
         address: data.address,
         photos: data.photos,
-        photosLink: "",
         description: data.description,
         perks: data.perks,
         extraInfo: data.extraInfo,
-        checkIn: data.checkIn,
-        checkOut: data.checkOut,
+        type: data.type,
         guests: data.guests,
         price: data.price,
       });
     });
   }, [id]);
+
+  const handleType = (e) => {
+    const { name } = e.target
+    if (input.type === name) {
+      setInput((prevInput) => ({
+        ...prevInput,
+        type: "",
+      }));
+    } else {
+      setInput((prevInput) => ({
+        ...prevInput,
+        type: name,
+      }));
+    }
+  }
 
   const handleChange = (e) => {
     setInput({
@@ -53,56 +74,35 @@ const PlacesFormPage = () => {
     });
   };
 
-  const addPhotoByLink = async (e) => {
-    e.preventDefault();
-    try {
-      const { data: filename } = await axios.post(
-        "/uploads-by-link",
-        { link: input.photosLink },
-        { withCredentials: true }
-      );
-      setInput((prev) => {
-        return {
-          ...prev,
-          photos: [...prev.photos, filename],
-          photosLink: "",
-        };
-      });
-      alert("Photo uploaded successfully");
-    } catch (error) {
-      alert("Error uploading photo");
-    }
-  };
 
   const uploadPhoto = (e) => {
     const files = e.target.files;
-  const data = new FormData();
-  for (let i = 0; i < files.length; i++) {
-    data.append("photos", files[i]);
-    console.log(files[i])
-  }
-  axios
-    .post(
-      "http://localhost:4000/upload", // Corregir la URL aquí
-      data,
-      { headers: { "Content-Type": "multipart/form-data" } }
-      
-    )
-    .then((res) => {
-      const { data: filenames } = res;
-      setInput((prev) => {
-        console.log(prev)
-        return {
-          ...prev,
-          photos: [...prev.photos, ...filenames],
-        };
-       
+    const data = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      data.append("photos", files[i]);
+      console.log(files[i])
+    }
+    axios
+      .post(
+        "http://localhost:4000/upload", // Corregir la URL aquí
+        data,
+        { headers: { "Content-Type": "multipart/form-data" } }
+
+      )
+      .then((res) => {
+        const { data: filenames } = res;
+        setInput((prev) => {
+          console.log(prev)
+          return {
+            ...prev,
+            photos: [...prev.photos, ...filenames],
+          };
+
+        });
+      })
+      .catch((error) => {
+        console.error("Error uploading photo: ", error);
       });
-      console.log(filenames)
-    })
-    .catch((error) => {
-      console.error("Error uploading photo: ", error);
-    });
   };
 
   const handlePerksChange = (updatedPerks) => {
@@ -113,30 +113,70 @@ const PlacesFormPage = () => {
   };
 
   const savePlace = async (e) => {
-    console.log(e)
     e.preventDefault();
-    try {
-      if (id) {
-        await axios.put(
-          "http://localhost:4000/places",
-          { data: input, id },
-          { withCredentials: true }
-        );
-      } else {
-        await axios.post(
-          "http://localhost:4000/places",
-          { data: input },
-          { withCredentials: true }
-        );
+    const newErrors = {}
+
+    if (input.title === "") {
+      newErrors.title = "The field cannot be empty"
+    }
+
+    if (input.address === "") {
+      newErrors.address = "The field cannot be empty";
+    }
+
+    if (input.photos.length < 5) {
+      newErrors.photos = "You must have at least 5 photos"
+    }
+
+    if (input.description === "") {
+      newErrors.description = "The field cannot be empty";
+    }
+
+    if (input.perks.length < 1) {
+      newErrors.perks = "Select at least 1 service"
+    }
+
+    if (input.type === "") {
+      newErrors.type = "You must select a type"
+    }
+
+    if (input.guests <= 0) {
+      newErrors.guests = "Can't be 0"
+    }
+
+    if (input.guests > 10) {
+      newErrors.guests = "Cannot be greater than 10"
+    }
+
+    if (input.price <= 0) {
+      newErrors.price = "Can't be 0"
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      alert("Fix your mistakes first")
+    } else {
+      try {
+        if (id) {
+          await axios.put(
+            "http://localhost:4000/places",
+            { data: input, id },
+            { withCredentials: true }
+          );
+        } else {
+          await axios.post(
+            "http://localhost:4000/places",
+            { data: input },
+            { withCredentials: true }
+          );
+        }
+        setRedirect(true);
+      } catch (error) {
+        console.error("Error saving place: ", error);
       }
-      setRedirect(true);
-    } catch (error) {
-      console.error("Error saving place: ", error);
-      // Aquí puedes manejar el error de acuerdo a tus necesidades,
-      // como mostrar un mensaje de error al usuario, volver a cargar la página, etc.
     }
   };
-  
+
   const removePhoto = (filename) => {
     setInput((prevInput) => ({
       ...prevInput,
@@ -155,12 +195,15 @@ const PlacesFormPage = () => {
     }));
   };
 
+
+  console.log(input.type);
+
   if (redirect) {
     return <Navigate to={"/account/places"} />;
   }
 
+  console.log(input, "estado");
 
-  console.log(input)
   return (
     <div className="mb-[150px]">
       <AccountNav />
@@ -173,6 +216,7 @@ const PlacesFormPage = () => {
           value={input.title}
           onChange={handleChange}
         />
+        {errors.title && <p className="text-red-600">{errors.title}</p>}
         <h2 className="text-2xl mt-4">Address</h2>
         <input
           type="text"
@@ -181,23 +225,8 @@ const PlacesFormPage = () => {
           value={input.address}
           onChange={handleChange}
         />
+        {errors.address && <p className="text-red-600">{errors.address}</p>}
         <h2 className="text-2xl mt-4">Photos</h2>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Add using a link .... jpg"
-            name="photosLink"
-            value={input.photosLink}
-            onChange={handleChange}
-          />
-          <button
-            onClick={addPhotoByLink}
-            className="bg-gray-200 px-4 rounded-2xl"
-          >
-            Add photo
-          </button>
-        </div>
-
         <div className="mt-2 grid gap-2 grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
           {input.photos.length > 0 &&
             input.photos.map((link) => (
@@ -207,7 +236,6 @@ const PlacesFormPage = () => {
                   src={link}
                   alt=""
                 />
-                  {console.log("Link:", link)}
                 <button
                   type="button"
                   onClick={() => removePhoto(link)}
@@ -291,6 +319,7 @@ const PlacesFormPage = () => {
             Upload
           </label>
         </div>
+        {errors.photos && <p className="text-red-600">{errors.photos}</p>}
         <h2 className="text-2xl mt-4">Description</h2>
         <textarea
           placeholder="description of the place"
@@ -298,11 +327,13 @@ const PlacesFormPage = () => {
           value={input.description}
           onChange={handleChange}
         />
+        {errors.description && <p className="text-red-600">{errors.description}</p>}
         <h2 className="text-2xl mt-4">Perks</h2>
         <p className="text-gray-500 text-sm">
           select all the perks of your place
         </p>
         <Perks selected={input.perks} onChange={handlePerksChange} />
+        {errors.perks && <p className="text-red-600">{errors.perks}</p>}
         <h2 className="text-2xl mt-4">Extra info</h2>
         <textarea
           placeholder="house, rules, etc"
@@ -310,32 +341,36 @@ const PlacesFormPage = () => {
           value={input.extraInfo}
           onChange={handleChange}
         />
-        <h2 className="text-2xl mt-4">Check in&out times</h2>
+        <h2 className="text-2xl mt-4">Types</h2>
         <p className="text-gray-500 text-sm">
-          add check in and out times, remember to have some time window for
-          cleaning the room between guests
+          Which of these options best describes your accommodation?
         </p>
-        <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
-          <div>
-            <h3 className="mt-2 -mb-1 text-center">Check in time</h3>
-            <input
-              type="text"
-              placeholder="14:00"
-              name="checkIn"
-              value={input.checkIn}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <h3 className="mt-2 -mb-1 text-center">Check out time</h3>
-            <input
-              type="text"
-              placeholder="11:00"
-              name="checkOut"
-              value={input.checkOut}
-              onChange={handleChange}
-            />
-          </div>
+        <div className="grid grid-cols-3 gap-2">
+          <button type="button" className={`w-full border my-1 py-2 px-3 rounded-2xl transition flex items-center justify-center gap-2 ${input.type === "house" ? "bg-primary" : "bg-transparent"} `} name="house" onClick={handleType}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+            </svg>
+            House
+          </button>
+          <button type="button" className={`w-full border my-1 py-2 px-3 rounded-2xl transition flex items-center justify-center gap-2 ${input.type === "apartment" ? "bg-primary" : "bg-transparent"} `} name="apartment" onClick={handleType}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+            </svg>
+            Apartment
+          </button>
+          <button type="button" className={`w-full border my-1 py-2 px-3 rounded-2xl transition flex items-center justify-center gap-2 ${input.type === "cabin" ? "bg-primary" : "bg-transparent"} `} name="cabin" onClick={handleType}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205 3 1m1.5.5-1.5-.5M6.75 7.364V3h-3v18m3-13.636 10.5-3.819" />
+            </svg>
+            cabin
+          </button>
+        </div>
+        {errors.type && <p className="text-red-600">{errors.type}</p>}
+        <h2 className="text-2xl mt-4">Guests & price</h2>
+        <p className="text-gray-500 text-sm">
+          How many people can stay here? & What will be the price per night?
+        </p>
+        <div className="grid gap-2 grid-cols-2 md:grid-cols-2">
           <div>
             <h3 className="mt-2 -mb-1 text-center">Max number of guests</h3>
             <input
@@ -344,6 +379,7 @@ const PlacesFormPage = () => {
               value={input.guests}
               onChange={handleChange}
             />
+            {errors.guests && <p className="text-red-600">{errors.guests}</p>}
           </div>
           <div>
             <h3 className="mt-2 -mb-1 text-center">Price per night</h3>
@@ -353,6 +389,7 @@ const PlacesFormPage = () => {
               value={input.price}
               onChange={handleChange}
             />
+            {errors.price && <p className="text-red-600">{errors.price}</p>}
           </div>
         </div>
 
